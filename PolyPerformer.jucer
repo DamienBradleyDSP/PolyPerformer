@@ -4,6 +4,26 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="g7o17h" name="PolyPerformer">
     <GROUP id="{B98C183D-778A-9068-A312-16B9E3531986}" name="Source">
+      <GROUP id="{188A7B22-6C6B-4C2D-0351-6F4CBDFAF139}" name="gui">
+        <FILE id="Xtytv5" name="guiBounds.cpp" compile="1" resource="0" file="Source/guiFiles/guiBounds.cpp"/>
+        <FILE id="UCD8rj" name="guiBounds.h" compile="0" resource="0" file="Source/guiFiles/guiBounds.h"/>
+        <FILE id="AAfpdU" name="modeSelector.cpp" compile="1" resource="0"
+              file="Source/guiFiles/modeSelector.cpp"/>
+        <FILE id="hx76sw" name="modeSelector.h" compile="0" resource="0" file="Source/guiFiles/modeSelector.h"/>
+        <FILE id="XlrSMP" name="noteSelector.cpp" compile="1" resource="0"
+              file="Source/guiFiles/noteSelector.cpp"/>
+        <FILE id="VorR4H" name="noteSelector.h" compile="0" resource="0" file="Source/guiFiles/noteSelector.h"/>
+        <FILE id="jcdJgB" name="OnOffButton.cpp" compile="1" resource="0" file="Source/guiFiles/OnOffButton.cpp"/>
+        <FILE id="lByKdS" name="OnOffButton.h" compile="0" resource="0" file="Source/guiFiles/OnOffButton.h"/>
+        <FILE id="VP5cje" name="polyModule.cpp" compile="1" resource="0" file="Source/guiFiles/polyModule.cpp"/>
+        <FILE id="A7N33x" name="polyModule.h" compile="0" resource="0" file="Source/guiFiles/polyModule.h"/>
+        <FILE id="scBfqC" name="rhythmLoader.cpp" compile="1" resource="0"
+              file="Source/guiFiles/rhythmLoader.cpp"/>
+        <FILE id="OUy4Bt" name="rhythmLoader.h" compile="0" resource="0" file="Source/guiFiles/rhythmLoader.h"/>
+        <FILE id="Od4Eyq" name="sustainSlider.cpp" compile="1" resource="0"
+              file="Source/guiFiles/sustainSlider.cpp"/>
+        <FILE id="EbyTTs" name="sustainSlider.h" compile="0" resource="0" file="Source/guiFiles/sustainSlider.h"/>
+      </GROUP>
       <FILE id="ZFxkZ0" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="pmgAzf" name="PluginProcessor.h" compile="0" resource="0"
@@ -51,4 +71,7 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

@@ -19,7 +19,8 @@ PolyPerformerAudioProcessor::PolyPerformerAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), undoManager(30000, 30),
+    parameters(*this, &undoManager, "state", createParameterLayout())
 #endif
 {
 }
@@ -166,7 +167,7 @@ bool PolyPerformerAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* PolyPerformerAudioProcessor::createEditor()
 {
-    return new PolyPerformerAudioProcessorEditor (*this);
+    return new PolyPerformerAudioProcessorEditor (*this,parameters);
 }
 
 //==============================================================================
@@ -181,6 +182,11 @@ void PolyPerformerAudioProcessor::setStateInformation (const void* data, int siz
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor::createParameterLayout()
+{
+    return juce::AudioProcessorValueTreeState::ParameterLayout();
 }
 
 //==============================================================================

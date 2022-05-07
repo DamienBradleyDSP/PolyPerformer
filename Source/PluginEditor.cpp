@@ -10,12 +10,13 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-PolyPerformerAudioProcessorEditor::PolyPerformerAudioProcessorEditor (PolyPerformerAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+PolyPerformerAudioProcessorEditor::PolyPerformerAudioProcessorEditor (PolyPerformerAudioProcessor& p, AudioProcessorValueTreeState& parameters)
+    : AudioProcessorEditor (&p), audioProcessor (p), gui(parameters)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (515, 319);
+    addAndMakeVisible(gui);
 }
 
 PolyPerformerAudioProcessorEditor::~PolyPerformerAudioProcessorEditor()
@@ -26,15 +27,12 @@ PolyPerformerAudioProcessorEditor::~PolyPerformerAudioProcessorEditor()
 void PolyPerformerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void PolyPerformerAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+
+    gui.setBounds(getLocalBounds());
 }

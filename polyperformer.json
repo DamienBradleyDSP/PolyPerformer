@@ -1,0 +1,153 @@
+[
+  [
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles"
+  ],
+  [
+    "guiBounds",
+    "component",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\guiBounds.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\guiBounds.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\guiBounds.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "modeSelector",
+    "rotarySlider",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\modeSelector_rotarySlider.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\modeSelector.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\modeSelector.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "noteSelector",
+    "button",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\noteSelector_button.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\noteSelector.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\noteSelector.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "OnOffButton",
+    "togglebutton",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\OnOffButton_togglebutton.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\OnOffButton.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\OnOffButton.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "polyModule",
+    "component",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\polyModule.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\polyModule.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\polyModule.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "rhythmLoader",
+    "component",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\rhythmLoader.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\rhythmLoader.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\rhythmLoader.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ],
+  [
+    "sustainSlider",
+    "rotarySlider",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/svgFiles\\sustainSlider_rotarySlider.svg",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\sustainSlider.h",
+    "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\sustainSlider.cpp",
+    {
+      "fileProcessingEnabled": 1
+    },
+    {
+      "include": 1,
+      "privatemembers": 1
+    },
+    {
+      "initialisation": 1,
+      "constructor": 1,
+      "paint": 1,
+      "resized": 1,
+      "function": 1
+    }
+  ]
+]

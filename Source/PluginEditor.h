@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "guiFiles/guiBounds.h"
 
 //==============================================================================
 /**
@@ -17,7 +18,7 @@
 class PolyPerformerAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    PolyPerformerAudioProcessorEditor (PolyPerformerAudioProcessor&);
+    PolyPerformerAudioProcessorEditor (PolyPerformerAudioProcessor&, AudioProcessorValueTreeState& parameters);
     ~PolyPerformerAudioProcessorEditor() override;
 
     //==============================================================================
@@ -28,6 +29,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PolyPerformerAudioProcessor& audioProcessor;
+    guiBounds gui;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyPerformerAudioProcessorEditor)
 };
