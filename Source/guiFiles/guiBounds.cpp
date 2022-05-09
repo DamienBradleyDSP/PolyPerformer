@@ -13,6 +13,7 @@
 guiBounds::guiBounds(AudioProcessorValueTreeState& parameters)
 	: unusedmember(0)
 // >>>>INITIALISATION>>>> (auto-generated)//
+, polyModuleArea(23,90,359,213)
 // <<<<INITIALISATION<<<< (will be overwritten!!)   
 {
 	// >>>>CONSTRUCTOR>>>> (auto-generated)//
@@ -21,7 +22,24 @@ guiBounds::guiBounds(AudioProcessorValueTreeState& parameters)
 	modeSelectorSlider1.setLookAndFeel(sliderLookFeel);
 	modeSelectorSlider1.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 	modeSelectorSlider1.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-	// <<<<CONSTRUCTOR<<<< (will be overwritten!!)   
+	// <<<<CONSTRUCTOR<<<< (will be overwritten!!)  
+
+	modeSelectorSlider1.setRotaryParameters(MathConstants<float>::pi,0, true);
+	modeSelectorSlider1.setMouseDragSensitivity(150);
+	modeSelectorSlider1.setRange(juce::Range<double>(1, 4), 1);
+	modeSelectorSlider1.setValue(4);
+	modeSelectorSlider1.onDragEnd = [this]()
+	{
+		//set parameter here
+
+		//if(modeSelectorSlider1.getValue())
+	};
+
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
+	for (auto&& modu : polyModules) addAndMakeVisible(*modu);
 }
 
 guiBounds::~guiBounds()
@@ -960,157 +978,152 @@ void guiBounds::paint (Graphics& g)
 	g.strokePath(divider,juce::PathStrokeType(1.0));
 
 	Path release;
-	release.startNewSubPath(378.5,167.678);
-	release.lineTo(378.5,165.693);
-	release.lineTo(387.293,165.693);
-	release.lineTo(387.293,167.486);
-	release.lineTo(385.195,167.486);
-	release.cubicTo(386.013,167.742,386.611,168.093,386.988,168.54);
-	release.cubicTo(387.366,168.986,387.554,169.445,387.554,169.915);
-	release.cubicTo(387.554,169.979,387.551,170.066,387.545,170.176);
-	release.lineTo(385.413,170.176);
-	release.cubicTo(385.413,169.166,385.09,168.496,384.446,168.165);
-	release.cubicTo(383.802,167.84,383.178,167.678,382.574,167.678);
-	release.lineTo(378.5,167.678);
+	release.startNewSubPath(383.5,167.678);
+	release.lineTo(383.5,165.693);
+	release.lineTo(392.293,165.693);
+	release.lineTo(392.293,167.486);
+	release.lineTo(390.195,167.486);
+	release.cubicTo(391.013,167.742,391.611,168.093,391.988,168.54);
+	release.cubicTo(392.366,168.986,392.554,169.445,392.554,169.915);
+	release.cubicTo(392.554,169.979,392.551,170.066,392.545,170.176);
+	release.lineTo(390.413,170.176);
+	release.cubicTo(390.413,169.166,390.09,168.496,389.446,168.165);
+	release.cubicTo(388.802,167.84,388.178,167.678,387.574,167.678);
+	release.lineTo(383.5,167.678);
 	release.closeSubPath();
-	release.startNewSubPath(381.303,177.202);
-	release.lineTo(381.06,178.995);
-	release.cubicTo(380.264,178.763,379.609,178.311,379.092,177.637);
-	release.cubicTo(378.575,176.964,378.317,176.12,378.317,175.104);
-	release.cubicTo(378.317,173.885,378.726,172.904,379.545,172.161);
-	release.cubicTo(380.363,171.418,381.472,171.047,382.87,171.047);
-	release.cubicTo(384.199,171.047,385.299,171.421,386.17,172.17);
-	release.cubicTo(387.041,172.919,387.476,173.934,387.476,175.217);
-	release.cubicTo(387.476,176.471,387.046,177.44,386.187,178.125);
-	release.cubicTo(385.328,178.81,384.226,179.152,382.879,179.152);
-	release.lineTo(382.653,179.143);
-	release.lineTo(382.653,173.11);
-	release.cubicTo(382.055,173.11,381.576,173.165,381.216,173.276);
-	release.cubicTo(380.856,173.392,380.543,173.618,380.276,173.955);
-	release.cubicTo(380.009,174.291,379.876,174.712,379.876,175.217);
-	release.cubicTo(379.876,176.198,380.351,176.86,381.303,177.202);
+	release.startNewSubPath(386.303,177.202);
+	release.lineTo(386.06,178.995);
+	release.cubicTo(385.264,178.763,384.609,178.311,384.092,177.637);
+	release.cubicTo(383.575,176.964,383.317,176.12,383.317,175.104);
+	release.cubicTo(383.317,173.885,383.726,172.904,384.545,172.161);
+	release.cubicTo(385.363,171.418,386.472,171.047,387.87,171.047);
+	release.cubicTo(389.199,171.047,390.299,171.421,391.17,172.17);
+	release.cubicTo(392.041,172.919,392.476,173.934,392.476,175.217);
+	release.cubicTo(392.476,176.471,392.046,177.44,391.187,178.125);
+	release.cubicTo(390.328,178.81,389.226,179.152,387.879,179.152);
+	release.lineTo(387.653,179.143);
+	release.lineTo(387.653,173.11);
+	release.cubicTo(387.055,173.11,386.576,173.165,386.216,173.276);
+	release.cubicTo(385.856,173.392,385.543,173.618,385.276,173.955);
+	release.cubicTo(385.009,174.291,384.876,174.712,384.876,175.217);
+	release.cubicTo(384.876,176.198,385.351,176.86,386.303,177.202);
 	release.closeSubPath();
-	release.startNewSubPath(383.933,177.08);
-	release.cubicTo(384.565,177.074,385.082,176.883,385.482,176.505);
-	release.cubicTo(385.883,176.134,386.083,175.673,386.083,175.121);
-	release.cubicTo(386.083,174.576,385.894,174.12,385.517,173.754);
-	release.cubicTo(385.146,173.389,384.617,173.174,383.933,173.11);
-	release.lineTo(383.933,177.08);
+	release.startNewSubPath(388.933,177.08);
+	release.cubicTo(389.565,177.074,390.082,176.883,390.482,176.505);
+	release.cubicTo(390.883,176.134,391.083,175.673,391.083,175.121);
+	release.cubicTo(391.083,174.576,390.894,174.12,390.517,173.754);
+	release.cubicTo(390.146,173.389,389.617,173.174,388.933,173.11);
+	release.lineTo(388.933,177.08);
 	release.closeSubPath();
-	release.startNewSubPath(378.5,182.939);
-	release.lineTo(378.5,180.954);
-	release.lineTo(390.384,180.954);
-	release.lineTo(390.384,182.939);
-	release.lineTo(378.5,182.939);
+	release.startNewSubPath(383.5,182.939);
+	release.lineTo(383.5,180.954);
+	release.lineTo(395.384,180.954);
+	release.lineTo(395.384,182.939);
+	release.lineTo(383.5,182.939);
 	release.closeSubPath();
-	release.startNewSubPath(381.303,190.923);
-	release.lineTo(381.06,192.716);
-	release.cubicTo(380.264,192.484,379.609,192.031,379.092,191.358);
-	release.cubicTo(378.575,190.685,378.317,189.84,378.317,188.824);
-	release.cubicTo(378.317,187.606,378.726,186.625,379.545,185.882);
-	release.cubicTo(380.363,185.139,381.472,184.767,382.87,184.767);
-	release.cubicTo(384.199,184.767,385.299,185.142,386.17,185.89);
-	release.cubicTo(387.041,186.639,387.476,187.655,387.476,188.938);
-	release.cubicTo(387.476,190.191,387.046,191.16,386.187,191.845);
-	release.cubicTo(385.328,192.53,384.226,192.873,382.879,192.873);
-	release.lineTo(382.653,192.864);
-	release.lineTo(382.653,186.831);
-	release.cubicTo(382.055,186.831,381.576,186.886,381.216,186.996);
-	release.cubicTo(380.856,187.112,380.543,187.339,380.276,187.675);
-	release.cubicTo(380.009,188.012,379.876,188.433,379.876,188.938);
-	release.cubicTo(379.876,189.918,380.351,190.58,381.303,190.923);
+	release.startNewSubPath(386.303,190.923);
+	release.lineTo(386.06,192.716);
+	release.cubicTo(385.264,192.484,384.609,192.031,384.092,191.358);
+	release.cubicTo(383.575,190.685,383.317,189.84,383.317,188.824);
+	release.cubicTo(383.317,187.606,383.726,186.625,384.545,185.882);
+	release.cubicTo(385.363,185.139,386.472,184.767,387.87,184.767);
+	release.cubicTo(389.199,184.767,390.299,185.142,391.17,185.89);
+	release.cubicTo(392.041,186.639,392.476,187.655,392.476,188.938);
+	release.cubicTo(392.476,190.191,392.046,191.16,391.187,191.845);
+	release.cubicTo(390.328,192.53,389.226,192.873,387.879,192.873);
+	release.lineTo(387.653,192.864);
+	release.lineTo(387.653,186.831);
+	release.cubicTo(387.055,186.831,386.576,186.886,386.216,186.996);
+	release.cubicTo(385.856,187.112,385.543,187.339,385.276,187.675);
+	release.cubicTo(385.009,188.012,384.876,188.433,384.876,188.938);
+	release.cubicTo(384.876,189.918,385.351,190.58,386.303,190.923);
 	release.closeSubPath();
-	release.startNewSubPath(383.933,190.801);
-	release.cubicTo(384.565,190.795,385.082,190.603,385.482,190.226);
-	release.cubicTo(385.883,189.855,386.083,189.393,386.083,188.842);
-	release.cubicTo(386.083,188.296,385.894,187.841,385.517,187.475);
-	release.cubicTo(385.146,187.109,384.617,186.895,383.933,186.831);
-	release.lineTo(383.933,190.801);
+	release.startNewSubPath(388.933,190.801);
+	release.cubicTo(389.565,190.795,390.082,190.603,390.482,190.226);
+	release.cubicTo(390.883,189.855,391.083,189.393,391.083,188.842);
+	release.cubicTo(391.083,188.296,390.894,187.841,390.517,187.475);
+	release.cubicTo(390.146,187.109,389.617,186.895,388.933,186.831);
+	release.lineTo(388.933,190.801);
 	release.closeSubPath();
-	release.startNewSubPath(378.5,202.205);
-	release.lineTo(378.5,200.316);
-	release.cubicTo(379.034,200.148,379.626,200.046,380.276,200.011);
-	release.cubicTo(378.97,199.483,378.317,198.491,378.317,197.034);
-	release.cubicTo(378.317,196.158,378.573,195.452,379.083,194.919);
-	release.cubicTo(379.6,194.39,380.247,194.126,381.025,194.126);
-	release.cubicTo(383.044,194.126,384.054,195.899,384.054,199.446);
-	release.cubicTo(384.054,199.585,384.051,199.774,384.046,200.012);
-	release.lineTo(384.707,200.012);
-	release.cubicTo(385.619,200.012,386.074,199.39,386.074,198.148);
-	release.cubicTo(386.074,196.941,385.619,196.256,384.707,196.094);
-	release.lineTo(384.96,194.405);
-	release.cubicTo(385.691,194.498,386.292,194.875,386.762,195.537);
-	release.cubicTo(387.238,196.198,387.476,197.156,387.476,198.41);
-	release.cubicTo(387.476,199.089,387.418,199.643,387.302,200.072);
-	release.cubicTo(387.191,200.502,387.0,200.865,386.727,201.161);
-	release.cubicTo(386.46,201.457,386.167,201.66,385.848,201.77);
-	release.cubicTo(385.534,201.886,385.0,201.944,384.246,201.944);
-	release.lineTo(380.276,201.944);
-	release.cubicTo(379.701,201.944,379.109,202.031,378.5,202.205);
+	release.startNewSubPath(383.5,202.205);
+	release.lineTo(383.5,200.316);
+	release.cubicTo(384.034,200.148,384.626,200.046,385.276,200.011);
+	release.cubicTo(383.97,199.483,383.317,198.491,383.317,197.034);
+	release.cubicTo(383.317,196.158,383.573,195.452,384.083,194.919);
+	release.cubicTo(384.6,194.39,385.247,194.126,386.025,194.126);
+	release.cubicTo(388.044,194.126,389.054,195.899,389.054,199.446);
+	release.cubicTo(389.054,199.585,389.051,199.774,389.046,200.012);
+	release.lineTo(389.707,200.012);
+	release.cubicTo(390.619,200.012,391.074,199.39,391.074,198.148);
+	release.cubicTo(391.074,196.941,390.619,196.256,389.707,196.094);
+	release.lineTo(389.96,194.405);
+	release.cubicTo(390.691,194.498,391.292,194.875,391.762,195.537);
+	release.cubicTo(392.238,196.198,392.476,197.156,392.476,198.41);
+	release.cubicTo(392.476,199.089,392.418,199.643,392.302,200.072);
+	release.cubicTo(392.191,200.502,392.0,200.865,391.727,201.161);
+	release.cubicTo(391.46,201.457,391.167,201.66,390.848,201.77);
+	release.cubicTo(390.534,201.886,390.0,201.944,389.246,201.944);
+	release.lineTo(385.276,201.944);
+	release.cubicTo(384.701,201.944,384.109,202.031,383.5,202.205);
 	release.closeSubPath();
-	release.startNewSubPath(382.975,200.012);
-	release.cubicTo(382.975,197.446,382.363,196.163,381.138,196.163);
-	release.cubicTo(380.772,196.163,380.459,196.291,380.198,196.547);
-	release.cubicTo(379.942,196.808,379.815,197.199,379.815,197.722);
-	release.cubicTo(379.815,198.476,380.053,199.045,380.528,199.428);
-	release.cubicTo(381.01,199.817,381.556,200.011,382.165,200.012);
-	release.lineTo(382.975,200.012);
+	release.startNewSubPath(387.975,200.012);
+	release.cubicTo(387.975,197.446,387.363,196.163,386.138,196.163);
+	release.cubicTo(385.772,196.163,385.459,196.291,385.198,196.547);
+	release.cubicTo(384.942,196.808,384.815,197.199,384.815,197.722);
+	release.cubicTo(384.815,198.476,385.053,199.045,385.528,199.428);
+	release.cubicTo(386.01,199.817,386.556,200.011,387.165,200.012);
+	release.lineTo(387.975,200.012);
 	release.closeSubPath();
-	release.startNewSubPath(380.52,203.259);
-	release.lineTo(380.877,205.122);
-	release.cubicTo(380.163,205.406,379.806,206.033,379.806,207.002);
-	release.cubicTo(379.806,208.233,380.169,208.848,380.894,208.848);
-	release.cubicTo(381.126,208.848,381.318,208.752,381.469,208.561);
-	release.cubicTo(381.62,208.369,381.721,208.143,381.773,207.882);
-	release.lineTo(382.078,206.28);
-	release.cubicTo(382.421,204.504,383.288,203.616,384.681,203.616);
-	release.cubicTo(385.459,203.616,386.118,203.897,386.657,204.46);
-	release.cubicTo(387.203,205.023,387.476,205.862,387.476,206.976);
-	release.cubicTo(387.476,208.834,386.794,209.968,385.43,210.38);
-	release.lineTo(385.073,208.613);
-	release.cubicTo(385.735,208.427,386.065,207.899,386.065,207.028);
-	release.cubicTo(386.065,205.972,385.735,205.444,385.073,205.444);
-	release.cubicTo(384.614,205.444,384.298,205.871,384.124,206.724);
-	release.lineTo(383.732,208.613);
-	release.cubicTo(383.43,210.081,382.589,210.816,381.208,210.816);
-	release.cubicTo(380.238,210.816,379.513,210.438,379.031,209.684);
-	release.cubicTo(378.555,208.929,378.317,208.033,378.317,206.994);
-	release.cubicTo(378.317,206.094,378.497,205.299,378.857,204.608);
-	release.cubicTo(379.223,203.918,379.777,203.468,380.52,203.259);
+	release.startNewSubPath(385.52,203.259);
+	release.lineTo(385.877,205.122);
+	release.cubicTo(385.163,205.406,384.806,206.033,384.806,207.002);
+	release.cubicTo(384.806,208.233,385.169,208.848,385.894,208.848);
+	release.cubicTo(386.126,208.848,386.318,208.752,386.469,208.561);
+	release.cubicTo(386.62,208.369,386.721,208.143,386.773,207.882);
+	release.lineTo(387.078,206.28);
+	release.cubicTo(387.421,204.504,388.288,203.616,389.681,203.616);
+	release.cubicTo(390.459,203.616,391.118,203.897,391.657,204.46);
+	release.cubicTo(392.203,205.023,392.476,205.862,392.476,206.976);
+	release.cubicTo(392.476,208.834,391.794,209.968,390.43,210.38);
+	release.lineTo(390.073,208.613);
+	release.cubicTo(390.735,208.427,391.065,207.899,391.065,207.028);
+	release.cubicTo(391.065,205.972,390.735,205.444,390.073,205.444);
+	release.cubicTo(389.614,205.444,389.298,205.871,389.124,206.724);
+	release.lineTo(388.732,208.613);
+	release.cubicTo(388.43,210.081,387.589,210.816,386.208,210.816);
+	release.cubicTo(385.238,210.816,384.513,210.438,384.031,209.684);
+	release.cubicTo(383.555,208.929,383.317,208.033,383.317,206.994);
+	release.cubicTo(383.317,206.094,383.497,205.299,383.857,204.608);
+	release.cubicTo(384.223,203.918,384.777,203.468,385.52,203.259);
 	release.closeSubPath();
-	release.startNewSubPath(381.303,218.015);
-	release.lineTo(381.06,219.809);
-	release.cubicTo(380.264,219.577,379.609,219.124,379.092,218.451);
-	release.cubicTo(378.575,217.777,378.317,216.933,378.317,215.917);
-	release.cubicTo(378.317,214.698,378.726,213.718,379.545,212.975);
-	release.cubicTo(380.363,212.232,381.472,211.86,382.87,211.86);
-	release.cubicTo(384.199,211.86,385.299,212.235,386.17,212.983);
-	release.cubicTo(387.041,213.732,387.476,214.748,387.476,216.03);
-	release.cubicTo(387.476,217.284,387.046,218.253,386.187,218.938);
-	release.cubicTo(385.328,219.623,384.226,219.965,382.879,219.965);
-	release.lineTo(382.653,219.957);
-	release.lineTo(382.653,213.924);
-	release.cubicTo(382.055,213.924,381.576,213.979,381.216,214.089);
-	release.cubicTo(380.856,214.205,380.543,214.431,380.276,214.768);
-	release.cubicTo(380.009,215.105,379.876,215.525,379.876,216.03);
-	release.cubicTo(379.876,217.011,380.351,217.673,381.303,218.015);
+	release.startNewSubPath(386.303,218.015);
+	release.lineTo(386.06,219.809);
+	release.cubicTo(385.264,219.577,384.609,219.124,384.092,218.451);
+	release.cubicTo(383.575,217.777,383.317,216.933,383.317,215.917);
+	release.cubicTo(383.317,214.698,383.726,213.718,384.545,212.975);
+	release.cubicTo(385.363,212.232,386.472,211.86,387.87,211.86);
+	release.cubicTo(389.199,211.86,390.299,212.235,391.17,212.983);
+	release.cubicTo(392.041,213.732,392.476,214.748,392.476,216.03);
+	release.cubicTo(392.476,217.284,392.046,218.253,391.187,218.938);
+	release.cubicTo(390.328,219.623,389.226,219.965,387.879,219.965);
+	release.lineTo(387.653,219.957);
+	release.lineTo(387.653,213.924);
+	release.cubicTo(387.055,213.924,386.576,213.979,386.216,214.089);
+	release.cubicTo(385.856,214.205,385.543,214.431,385.276,214.768);
+	release.cubicTo(385.009,215.105,384.876,215.525,384.876,216.03);
+	release.cubicTo(384.876,217.011,385.351,217.673,386.303,218.015);
 	release.closeSubPath();
-	release.startNewSubPath(383.932,217.893);
-	release.cubicTo(384.565,217.888,385.082,217.696,385.482,217.319);
-	release.cubicTo(385.883,216.947,386.083,216.486,386.083,215.935);
-	release.cubicTo(386.083,215.389,385.894,214.933,385.517,214.568);
-	release.cubicTo(385.146,214.202,384.617,213.987,383.932,213.924);
-	release.lineTo(383.932,217.893);
+	release.startNewSubPath(388.932,217.893);
+	release.cubicTo(389.565,217.888,390.082,217.696,390.482,217.319);
+	release.cubicTo(390.883,216.947,391.083,216.486,391.083,215.935);
+	release.cubicTo(391.083,215.389,390.894,214.933,390.517,214.568);
+	release.cubicTo(390.146,214.202,389.617,213.987,388.932,213.924);
+	release.lineTo(388.932,217.893);
 	release.closeSubPath();
 
 	g.setColour(Colour::fromRGB(172,102,117));
 	g.setOpacity(1.0);
 	g.fillPath(release);
-
-	Rectangle<float> polyModuleArea(23,90,310,213);
-	g.setColour(Colour::fromRGB(196,196,196));
-	g.setOpacity(1.0);
-	g.fillRect(polyModuleArea);
 
 	// <<<<PAINT<<<< (will be overwritten!!)
 }
@@ -1120,6 +1133,14 @@ void guiBounds::resized()
 	// >>>>RESIZED>>>> (auto-generated)//
 	modeSelectorSlider1.setBounds(402,79,113,233);
 	// <<<<RESIZED<<<< (will be overwritten!!)
+
+	auto moduleHeight = (polyModuleArea.getHeight()-(polyModulepixelGap*3))/4;
+	for (auto&& modu : polyModules)
+	{
+		modu->setBounds(polyModuleArea.removeFromTop(moduleHeight));
+		polyModuleArea.removeFromTop(polyModulepixelGap);
+	}
+
 }
 
 // >>>>FUNCTION>>>> (auto-generated)//

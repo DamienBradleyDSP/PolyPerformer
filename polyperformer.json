@@ -31,7 +31,7 @@
     "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\modeSelector.h",
     "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\modeSelector.cpp",
     {
-      "fileProcessingEnabled": 1
+      "fileProcessingEnabled": 0
     },
     {
       "include": 1,
@@ -136,7 +136,7 @@
     "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\sustainSlider.h",
     "C:/Users/Damien/Documents/GitHub/PolyPerformer/Source/guiFiles\\sustainSlider.cpp",
     {
-      "fileProcessingEnabled": 1
+      "fileProcessingEnabled": 0
     },
     {
       "include": 1,

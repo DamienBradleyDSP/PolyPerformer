@@ -26,9 +26,9 @@ private:
 
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	void toggleOff(Graphics &);
-	void toggleHover(Graphics &);
+	void toggleOffHover(Graphics &);
+	void toggleOnHover(Graphics &);
 	void toggleOn(Graphics &);
-	void toggleOnClicked(Graphics &);
 	// <<<<PRIVATEMEMBERS<<<< (will be overwritten!!)
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OnOffButton)

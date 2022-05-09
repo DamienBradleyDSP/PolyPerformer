@@ -12,6 +12,7 @@
 //==============================================================================
 
 // >>>>INITIALISATION>>>> (auto-generated)//
+
 // <<<<INITIALISATION<<<< (will be overwritten!!)   
 
 // >>>>CONSTRUCTOR>>>> (auto-generated)//
@@ -83,18 +84,18 @@ void modeSelector::drawRotarySlider(Graphics& g, int x, int y, int width, int he
 	g.setOpacity(1.0);
 	g.strokePath(Line4,juce::PathStrokeType(3));
 
-	Path Arrow1;
+	/*Path Arrow1;
 	Arrow1.startNewSubPath(22.0,29.2265);
 	Arrow1.lineTo(16.2265,35.0);
 	Arrow1.lineTo(22.0,40.7735);
 	Arrow1.lineTo(27.7735,35.0);
 	Arrow1.lineTo(22.0,29.2265);
 	Arrow1.closeSubPath();
-	Arrow1.startNewSubPath(23.0,110.0);
+	Arrow1.startNewSubPath(23.0,109.0);
 	Arrow1.lineTo(23.0,35.0);
 	Arrow1.lineTo(21.0,35.0);
-	Arrow1.lineTo(21.0,110.0);
-	Arrow1.lineTo(23.0,110.0);
+	Arrow1.lineTo(21.0,109.0);
+	Arrow1.lineTo(23.0,109.0);
 	Arrow1.closeSubPath();
 
 	g.setColour(Colour::fromRGB(126,77,88));
@@ -105,6 +106,7 @@ void modeSelector::drawRotarySlider(Graphics& g, int x, int y, int width, int he
 	g.setColour(Colour::fromRGB(218,132,151));
 	g.setOpacity(1.0);
 	g.fillEllipse(Ellipse2);
+	*/
 
 	Path unknown13;
 	unknown13.startNewSubPath(32.7861,45.0);
@@ -424,6 +426,30 @@ void modeSelector::drawRotarySlider(Graphics& g, int x, int y, int width, int he
 	g.fillPath(modeselect);
 
 	// <<<<PAINT<<<< (will be overwritten!!)
+	auto transform = AffineTransform::rotation(toAngle, 22, 117);
+	//draggableElement = draggableElement.transformedBy(transform);
+
+	Path Arrow1;
+	Arrow1.startNewSubPath(22.0, 29.2265);
+	Arrow1.lineTo(16.2265, 35.0);
+	Arrow1.lineTo(22.0, 40.7735);
+	Arrow1.lineTo(27.7735, 35.0);
+	Arrow1.lineTo(22.0, 29.2265);
+	Arrow1.closeSubPath();
+	Arrow1.startNewSubPath(23.0, 110.0);
+	Arrow1.lineTo(23.0, 35.0);
+	Arrow1.lineTo(21.0, 35.0);
+	Arrow1.lineTo(21.0, 110.0);
+	Arrow1.lineTo(23.0, 110.0);
+	Arrow1.closeSubPath();
+	g.setColour(Colour::fromRGB(126, 77, 88));
+	g.setOpacity(1.0);
+	g.fillPath(Arrow1,transform);
+	
+	Rectangle<float> Ellipse2(14.0, 109.0, 16.0, 16.0);
+	g.setColour(Colour::fromRGB(218, 132, 151));
+	g.setOpacity(1.0);
+	g.fillEllipse(Ellipse2);
 }
 
 

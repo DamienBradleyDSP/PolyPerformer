@@ -13,6 +13,7 @@ using namespace juce;
 // >>>>INCLUDE>>>> (auto-generated)//
 #include "modeSelector.h"
 // <<<<INCLUDE<<<< (will be overwritten!!)
+#include "polyModule.h"
 
 //==============================================================================
 /*
@@ -33,5 +34,10 @@ private:
 
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	juce::Slider modeSelectorSlider1;
+	Rectangle<int> polyModuleArea;
 	// <<<<PRIVATEMEMBERS<<<< (will be overwritten!!)
+
+	const int polyModulepixelGap = 7;
+	
+	std::vector<std::unique_ptr<polyModule>> polyModules;
 };

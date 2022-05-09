@@ -183,7 +183,9 @@ void PolyPerformerAudioProcessor::setStateInformation (const void* data, int siz
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
-
+void PolyPerformerAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+}
 juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor::createParameterLayout()
 {
     return juce::AudioProcessorValueTreeState::ParameterLayout();

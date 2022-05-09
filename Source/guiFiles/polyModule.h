@@ -20,7 +20,7 @@ using namespace juce;
 //==============================================================================
 /*
 */
-class polyModule : public Component
+class polyModule : public Component, Button::Listener
 {
 public:
 	polyModule() =delete;
@@ -34,10 +34,15 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(polyModule)
 	int unusedmember;
 
+	void buttonClicked(Button*) override;
+
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	juce::Slider sustainSliderSlider1;
 	noteSelector noteSelector1;
 	OnOffButton OnOffButton1;
 	rhythmLoader rhythmLoader1;
 	// <<<<PRIVATEMEMBERS<<<< (will be overwritten!!)
+
+	MidiKeyboardState noteSelectorKeyState;
+	MidiKeyboardComponent noteSelectorKeyboard;
 };

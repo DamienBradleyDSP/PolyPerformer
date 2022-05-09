@@ -16,20 +16,20 @@ using namespace juce;
 //==============================================================================
 /*
 */
-class rhythmLoader : public Component
+class rhythmLoader : public Button
 {
 public:
 	rhythmLoader() =delete;
 	rhythmLoader(AudioProcessorValueTreeState& parameters);
     ~rhythmLoader();
 
-    void paint (Graphics&) override;
-    void resized() override;
+	void paintButton(Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(rhythmLoader)
 	int unusedmember;
 
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
+	Label fileName1;
 	// <<<<PRIVATEMEMBERS<<<< (will be overwritten!!)
 };

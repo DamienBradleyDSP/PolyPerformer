@@ -16,7 +16,7 @@ using namespace juce;
 //==============================================================================
 /*
 */
-class noteSelector : public Button
+class noteSelector : public Button, public MidiKeyboardState::Listener
 {
 public:
 	noteSelector()=delete;
@@ -27,6 +27,12 @@ protected:
 	void paintButton(Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
 private:
+
+	void handleNoteOn(MidiKeyboardState* source,
+		int midiChannel, int midiNoteNumber, float velocity) override;
+
+	void handleNoteOff(MidiKeyboardState* source,
+		int midiChannel, int midiNoteNumber, float velocity) override;
 
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	Label noteDisplay1;
