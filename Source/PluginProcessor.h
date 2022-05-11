@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Sequencer.h"
 
 //==============================================================================
 /**
@@ -60,6 +61,16 @@ private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::UndoManager undoManager;
     juce::AudioProcessorValueTreeState parameters;
+
+    Sequencer sequencer;
+    juce::AudioPlayHead::CurrentPositionInfo currentpositionstruct;
+
+    juce::ValueTree newPreset;
+    juce::String currentPresetName;
+
+    int frameCounter = 0; // TESTING
+    double srate;
+    int buff;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyPerformerAudioProcessor)

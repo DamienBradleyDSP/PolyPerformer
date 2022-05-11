@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="HIpi7F" name="PolyPerformer" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+<JUCERPROJECT id="HIpi7F" name="PolyPerformer" projectType="audioplug" useAppConfig="1"
+              addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
+              bundleIdentifier="com.SuperConductor.PolyPerformer" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginManufacturer="SuperConductor" pluginManufacturerCode="SuCo"
+              pluginCode="PPer" aaxIdentifier="com.SuperConductor.PolyPerformer">
   <MAINGROUP id="g7o17h" name="PolyPerformer">
     <GROUP id="{B98C183D-778A-9068-A312-16B9E3531986}" name="Source">
       <GROUP id="{188A7B22-6C6B-4C2D-0351-6F4CBDFAF139}" name="gui">
@@ -24,6 +27,23 @@
               file="Source/guiFiles/sustainSlider.cpp"/>
         <FILE id="EbyTTs" name="sustainSlider.h" compile="0" resource="0" file="Source/guiFiles/sustainSlider.h"/>
       </GROUP>
+      <FILE id="Od9IGJ" name="ProjectSettings.h" compile="0" resource="0"
+            file="Source/ProjectSettings.h"/>
+      <FILE id="k5ghU1" name="Beat.cpp" compile="1" resource="0" file="Source/Beat.cpp"/>
+      <FILE id="CL8vYV" name="Beat.h" compile="0" resource="0" file="Source/Beat.h"/>
+      <FILE id="wZImpb" name="RhythmModule.cpp" compile="1" resource="0"
+            file="Source/RhythmModule.cpp"/>
+      <FILE id="IrfuKg" name="RhythmModule.h" compile="0" resource="0" file="Source/RhythmModule.h"/>
+      <FILE id="mVnCbm" name="SequencerModule.cpp" compile="1" resource="0"
+            file="Source/SequencerModule.cpp"/>
+      <FILE id="VnBxnd" name="SequencerModule.h" compile="0" resource="0"
+            file="Source/SequencerModule.h"/>
+      <FILE id="cTN585" name="MidiController.cpp" compile="1" resource="0"
+            file="Source/MidiController.cpp"/>
+      <FILE id="XScOvs" name="MidiController.h" compile="0" resource="0"
+            file="Source/MidiController.h"/>
+      <FILE id="h75auK" name="Sequencer.cpp" compile="1" resource="0" file="Source/Sequencer.cpp"/>
+      <FILE id="gnqd7j" name="Sequencer.h" compile="0" resource="0" file="Source/Sequencer.h"/>
       <FILE id="ZFxkZ0" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="pmgAzf" name="PluginProcessor.h" compile="0" resource="0"
@@ -37,8 +57,10 @@
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="PolyPerformer"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="PolyPerformer"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="PolyPerformer" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Users\Damien\Documents\VST"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="PolyPerformer" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Users\Damien\Documents\VST"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
