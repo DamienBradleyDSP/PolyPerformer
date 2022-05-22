@@ -201,7 +201,39 @@ void PolyPerformerAudioProcessor::parameterChanged(const juce::String& parameter
 }
 juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor::createParameterLayout()
 {
-    return juce::AudioProcessorValueTreeState::ParameterLayout();
+    AudioProcessorValueTreeState::ParameterLayout layout;
+
+    // Sequencer / Global Parameters
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "loadSaveState",
+        /*paramName*/ "loadSaveState",
+        /*LabelText*/ "loadSaveState",
+        /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1, 1),
+        /*Default/Initial value*/ 0,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ true,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ true));
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "modeSelect",
+        /*paramName*/ "modeSelect",
+        /*LabelText*/ "modeSelect",
+        /*Min,max, optional:precision*/ juce::NormalisableRange<float>(1, 4, 1),
+        /*Default/Initial value*/ 1,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ true,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ false));
+
+    return layout;
 }
 
 //==============================================================================

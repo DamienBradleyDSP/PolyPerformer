@@ -30,14 +30,30 @@ void MidiController::initialise(double s, int b)
     totalNumberOfBars = 0;
     totalSampleLength = 0;
     sampleOverspill = false;
+    resetNoteStart = false;
+}
+
+void MidiController::resetRhythmTrack(int sampleLocation)
+{
+    resetNoteStart = true;
+    samplesToNoteReset = sampleLocation;
 }
 
 void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumOfBars)
 {
+
     totalNumberOfBars = totalNumOfBars;
     double barsPerMinute = (double)currentpositionstruct.bpm / 4.0;
     oneBarSampleLength = ((4.0 * 60.0) / (double)currentpositionstruct.bpm) * sampleRate;
     totalSampleLength = (totalNumberOfBars / barsPerMinute) * 60.0 * sampleRate; //length in samples of the total number of bars spanned by the given rhythm modules
+
+    /// RESET LOOP ADDITION
+    if (resetNoteStart)
+    {  
+        samplesFromRhythmStart = totalSampleLength - samplesToNoteReset;
+        resetNoteStart=false;
+    }
+    /// _____________________________________________
 
     if ((samplesFromRhythmStart + (double)bufferLength) > totalSampleLength)
     {

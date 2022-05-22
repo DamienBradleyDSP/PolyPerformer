@@ -19,8 +19,9 @@ public:
     MidiController(juce::AudioProcessorValueTreeState& parameters);
     ~MidiController();
 
-    // Sequencer Interface
+    // SequencerModule Interface
     void initialise(double sampleRate, int bufferSize);
+    void resetRhythmTrack(int sampleLocation);
     void calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumberOfBars);
     void applyMidiMessages(juce::MidiBuffer& buffer);
 
@@ -50,4 +51,7 @@ private:
     std::list<juce::MidiMessage> sustainedMidiMessages;
 
     bool sustainToNextNote = false;
+
+    bool resetNoteStart = false;
+    int samplesToNoteReset = 0;
 };

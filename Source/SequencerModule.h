@@ -10,7 +10,9 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "MidiController.h"
+#include "ProjectSettings.h"
+#include "MidiVoice.h"
+#include "RhythmModule.h"
 
 class SequencerModule
 {
@@ -20,12 +22,20 @@ public:
     ~SequencerModule();
 
     void initialise(double sampleRate, int bufferSize);
-    void resetRhythmTrack();
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
 
-private:
+    void addNoteOn(juce::MidiMessage message, int sampleLocation);
+    void addNoteOff(juce::MidiMessage message, int sampleLocation);
+    void changeSustain(bool sustain, int sampleLocation);
+    void removeSustainedNote(int noteNumber, int sampleLocation);
 
-    float sampleRate;
-    int bufferSize;
-    MidiController midiController;
+private:
+    
+    std::vector<MidiVoice> midiVoices;
+    std::list<MidiVoice*> playingVoices; // holds playing voices in order
+    std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
+
+    std::vector<RhythmModule> rhythmModules;
+
+    bars barOffset = 0;
 };
