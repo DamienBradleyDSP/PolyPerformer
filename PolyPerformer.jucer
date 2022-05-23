@@ -27,6 +27,10 @@
               file="Source/guiFiles/sustainSlider.cpp"/>
         <FILE id="EbyTTs" name="sustainSlider.h" compile="0" resource="0" file="Source/guiFiles/sustainSlider.h"/>
       </GROUP>
+      <FILE id="EHD7fA" name="MidiController.cpp" compile="1" resource="0"
+            file="Source/MidiController.cpp"/>
+      <FILE id="UGCDRg" name="MidiController.h" compile="0" resource="0"
+            file="Source/MidiController.h"/>
       <FILE id="GtAnSl" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
       <FILE id="TqeGtF" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
       <FILE id="Od9IGJ" name="ProjectSettings.h" compile="0" resource="0"
@@ -40,10 +44,6 @@
             file="Source/SequencerModule.cpp"/>
       <FILE id="VnBxnd" name="SequencerModule.h" compile="0" resource="0"
             file="Source/SequencerModule.h"/>
-      <FILE id="cTN585" name="MidiController.cpp" compile="1" resource="0"
-            file="Source/MidiController.cpp"/>
-      <FILE id="XScOvs" name="MidiController.h" compile="0" resource="0"
-            file="Source/MidiController.h"/>
       <FILE id="h75auK" name="Sequencer.cpp" compile="1" resource="0" file="Source/Sequencer.cpp"/>
       <FILE id="gnqd7j" name="Sequencer.h" compile="0" resource="0" file="Source/Sequencer.h"/>
       <FILE id="ZFxkZ0" name="PluginProcessor.cpp" compile="1" resource="0"

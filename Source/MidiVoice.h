@@ -9,8 +9,9 @@
 */
 
 #pragma once
-#include "MidiController.h"
+#include "JuceHeader.h"
 #include "ProjectSettings.h"
+#include "MidiController.h"
 
 class MidiVoice
 {
@@ -22,25 +23,29 @@ public:
     void initialise(double sampleRate, int bufferSize);
 
     // Midi Input Functions // Sequencer Module Interface
-    int getNoteNumber();
-    void addNoteOn(MidiMessage message, int sampleLocation);
-    bool addNoteOff(int sampleLocation);
-    void changeSustain(bool sustain, int sampleLocation);
-    void removeSustainedNote(int sampleLocation);
+    bool midiInputMessage(MidiMessage message);
 
-    // Exposing MidiController to Sequencer Module // Sequencer Module Interface
-    MidiController& exposeMidiController();
+    // Midi Generation Functions // Sequencer Module Interface
+    void prepareMidiControllers(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumberOfBars);
+    void addMidiToBuffer(juce::MidiBuffer& buffer);
 
-    // Midi Generation Functions // Beat interface
-    void addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain = false);
+    // Midi Generation Functions // Beat Interface
+    void addBeatMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
 
 private:
 
-    MidiController midiController;
+    void addController();
+    void removeController();
 
-    int midiNoteNumber = -1;
-    bool sustain = false;
+    double sampleRate;
+    int bufferSize;
 
+    // Voice Settings
+    bool sustainedVoice = false;
 
-    // add sustains and velocity stuff here
+    // Midi Controllers
+    MidiController controller1;
+    MidiController controller2;
+    std::list<MidiController*> controllerList;
+
 };

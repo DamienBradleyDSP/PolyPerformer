@@ -19,17 +19,31 @@ public:
     MidiController(juce::AudioProcessorValueTreeState& parameters);
     ~MidiController();
 
-    // SequencerModule Interface
+    // MidiVoice Interface
     void initialise(double sampleRate, int bufferSize);
-    void resetRhythmTrack(int sampleLocation);
+    void controllerTurningOn(MidiMessage message);
+    void controllerTurningOff(MidiMessage message);
     void calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumberOfBars);
     void applyMidiMessages(juce::MidiBuffer& buffer);
+    void copyMidiList(MidiController* controllerToCopy);
 
     // Beat Interface
-    void addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain = false);
+    void addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
 
+    // MidiController Interface
+    void getDelayedMessages(std::list<std::pair<juce::MidiMessage, bars>>& noteOffMessages,
+                            std::list<juce::MidiMessage>& sustainedMidiMessages);
 
 private:
+
+    // MESSAGE / RHYTHM RESET TRACK
+    bool resetNoteStart = false;
+    bool turningOn = false;
+    bool turningOff = false;
+    int samplesToNoteReset = 0;
+    MidiMessage message;
+    void applyMessageChanges(juce::MidiMessage& message);
+    //___________________________
 
     void checkNoteOffMessages();
     int getLocation(bars barPosition);
@@ -51,7 +65,4 @@ private:
     std::list<juce::MidiMessage> sustainedMidiMessages;
 
     bool sustainToNextNote = false;
-
-    bool resetNoteStart = false;
-    int samplesToNoteReset = 0;
 };

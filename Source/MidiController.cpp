@@ -31,12 +31,23 @@ void MidiController::initialise(double s, int b)
     totalSampleLength = 0;
     sampleOverspill = false;
     resetNoteStart = false;
+    turningOn = false;
+    turningOff = false;
 }
 
-void MidiController::resetRhythmTrack(int sampleLocation)
+void MidiController::controllerTurningOn(MidiMessage m)
 {
     resetNoteStart = true;
-    samplesToNoteReset = sampleLocation;
+    turningOn = true;
+    samplesToNoteReset = m.getTimeStamp();
+    message = m;
+}
+
+void MidiController::controllerTurningOff(MidiMessage m)
+{
+    samplesToNoteReset = m.getTimeStamp();
+    turningOff = true;
+    message = m;
 }
 
 void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumOfBars)
@@ -87,15 +98,29 @@ void MidiController::applyMidiMessages(juce::MidiBuffer& buffer)
         buffer.addEvent(message.first, message.second);
     }
     bufferMidiMessages.clear();
+
+    turningOn = false;
+    turningOff = false;
 }
 
-void MidiController::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain)
+void MidiController::copyMidiList(MidiController* controllerToCopy)
 {
-    // Currently checks twice but why
+    controllerToCopy->getDelayedMessages(noteOffMessages, sustainedMidiMessages);
+}
+
+void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain)
+{
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
-    bufferMidiMessages.push_back(std::make_pair(noteOnMessage, noteOnSampleLocation));
 
+    // POLYPERFORMER FUNCTION EDIT
+    if (turningOn && noteOnSampleLocation < samplesToNoteReset) return;
+    if (turningOff && noteOnSampleLocation > samplesToNoteReset) return;
+    applyMessageChanges(noteOnMessage);
+    applyMessageChanges(noteOffMessage);
+    //______________________________
+
+    bufferMidiMessages.push_back(std::make_pair(noteOnMessage, noteOnSampleLocation));
     if (sustainToNextNote)
     {
         for (auto&& message : sustainedMidiMessages)
@@ -112,6 +137,20 @@ void MidiController::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars
         sustainToNextNote = true;
     }
     else noteOffMessages.push_back(std::make_pair(noteOffMessage, noteOffPosition));
+}
+
+void MidiController::getDelayedMessages(std::list<std::pair<juce::MidiMessage, bars>>& o, std::list<juce::MidiMessage>& s)
+{
+    for (auto&& message : o) sustainedMidiMessages.push_back(message.first);
+    for (auto&& message : s) sustainedMidiMessages.push_back(message);
+}
+
+void MidiController::applyMessageChanges(juce::MidiMessage& m)
+{
+    auto noteNumberRelativeToC = m.getNoteNumber() - 72;
+    auto newNoteNumber = message.getNoteNumber() + noteNumberRelativeToC;
+    m.setNoteNumber(newNoteNumber);
+    m.setVelocity(m.getFloatVelocity() * message.getFloatVelocity());
 }
 
 void MidiController::checkNoteOffMessages()

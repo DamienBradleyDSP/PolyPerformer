@@ -11,7 +11,8 @@
 #include "MidiVoice.h"
 
 MidiVoice::MidiVoice(juce::AudioProcessorValueTreeState& parameters) :
-    midiController(parameters)
+    controller1(parameters),
+    controller2(parameters)
 {
 }
 
@@ -19,49 +20,65 @@ MidiVoice::~MidiVoice()
 {
 }
 
-void MidiVoice::initialise(double sampleRate, int bufferSize)
+void MidiVoice::initialise(double s, int b)
 {
-    midiController.initialise(sampleRate,bufferSize);
+    sampleRate = s;
+    bufferSize = b;
+    controller1.initialise(s, b);
+    controller2.initialise(s, b);
+    controllerList.clear();
+    controllerList.push_back(&controller1);
 }
 
-int MidiVoice::getNoteNumber()
+// MIDI VOICE
+
+bool MidiVoice::midiInputMessage(MidiMessage message)
 {
-    return midiNoteNumber;
-}
-
-void MidiVoice::addNoteOn(MidiMessage message, int sampleLocation)
-{
-    // EDGE CASE - WHAT HAPPENS WHEN A USER PRESSES A NOTE, THE NOTE WILL CHANGE EARLY
-
-    midiNoteNumber = message.getNoteNumber();
-    midiController.resetRhythmTrack(sampleLocation);
-}
-
-bool MidiVoice::addNoteOff(int sampleLocation)
-{
-    if (sustain) return false;
-    midiController.resetRhythmTrack(sampleLocation);
-    midiNoteNumber = -1;
-
+    if (sustainedVoice && message.isNoteOff() && !message.isSustainPedalOff()) return false;
+    if (message.isSustainPedalOn()) sustainedVoice = true;
+    if (message.isSustainPedalOff()) sustainedVoice = false;
+    addController();
+    controllerList.front()->controllerTurningOff(message);
+    controllerList.back()->controllerTurningOn(message);
     return true;
 }
 
-void MidiVoice::changeSustain(bool flag, int sampleLocation)
+void MidiVoice::prepareMidiControllers(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumberOfBars)
 {
-    sustain = flag;
+    for (auto&& controller : controllerList) controller->calculateBufferSamples(currentpositionstruct, totalNumberOfBars);
 }
 
-void MidiVoice::removeSustainedNote(int sampleLocation)
+void MidiVoice::addMidiToBuffer(juce::MidiBuffer& buffer)
 {
-    sustain = false;
-    addNoteOff(sampleLocation);
+    for (auto&& controller : controllerList) controller->applyMidiMessages(buffer);
+    removeController();
 }
 
-MidiController& MidiVoice::exposeMidiController()
+void MidiVoice::addBeatMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain)
 {
-    return midiController;
+    for (auto&& controller : controllerList) controller->addMidiMessage(noteOnMessage,noteOnPosition,noteOffMessage,noteOffPosition,sustain);
 }
 
-void MidiVoice::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain)
+void MidiVoice::addController()
 {
+    if (controllerList.size() == 1)
+    {
+        if (&controller1 == controllerList.front()) controllerList.push_back(&controller2);
+        else controllerList.push_back(&controller1);
+    }
+    else return;
 }
+
+void MidiVoice::removeController()
+{
+    if (controllerList.size() > 1)
+    {
+        controllerList.back()->copyMidiList(controllerList.front());
+        controllerList.front()->initialise(sampleRate, bufferSize);
+        controllerList.pop_front();
+    }
+    else return;
+}
+
+
+

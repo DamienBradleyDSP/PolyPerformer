@@ -24,16 +24,17 @@ public:
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
 
-    void addNoteOn(juce::MidiMessage message, int sampleLocation);
-    void addNoteOff(juce::MidiMessage message, int sampleLocation);
-    void changeSustain(bool sustain, int sampleLocation);
-    void removeSustainedNote(int noteNumber, int sampleLocation);
+    void addNoteOn(juce::MidiMessage message);
+    void addNoteOff(juce::MidiMessage message);
+    void changeSustain(juce::MidiMessage message);
 
 private:
-    
+
     std::vector<MidiVoice> midiVoices;
     std::list<MidiVoice*> playingVoices; // holds playing voices in order
     std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
+    std::list<std::list<MidiVoice*>::iterator> voicesStoppingAtBufferEnd;
+    std::map<MidiVoice*, int> mapVoiceToNote;
 
     std::vector<RhythmModule> rhythmModules;
 

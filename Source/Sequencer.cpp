@@ -79,42 +79,47 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
     //                              >> Rhythm >> Beat
     // Pass midi voice + buffer to rhythm and beat,  beat will make checks and pass buffer to voice
 
+    message.setTimeStamp(sampleLocation);
     if (message.isNoteOn())
     {
         // note off any module currently running from this note
         // run algorithm from mode selection (eg. random module selection)
         // assign note on to module
 
-        if (midiState.isNoteOn(0, message.getNoteNumber())) midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(message, sampleLocation);
+        if (midiState.isNoteOn(0, message.getNoteNumber()))
+        {
+            MidiMessage noteOff = MidiMessage::noteOff(0,message.getNoteNumber());
+            midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(noteOff);
+        }
         midiState.processNextMidiEvent(message);
 
         // Mode selection
-        if (modeSelect->load() == 0) processRandomNoteOn(message, sampleLocation); // Mode 1
+        if (modeSelect->load() == 0) processRandomNoteOn(message); // Mode 1
     }
     else if (message.isNoteOff())
     {
         midiState.processNextMidiEvent(message);
-        midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(message, sampleLocation);
+        midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(message);
     }
     else if (message.isSustainPedalOn())
     {
         // add sustain flag to all current voices
-        for (auto&& modu : sequencerModules) modu.changeSustain(true,sampleLocation);
+        for (auto&& modu : sequencerModules) modu.changeSustain(true);
     }
     else if (message.isSustainPedalOff())
     {
         // stop all voices playing that aren't currently on in midiState
         for (int midiNote = 0; midiNote < 128; midiNote++)
         {
-            if (!midiState.isNoteOn(0, midiNote)) midiNoteToSequencerMap[midiNote]->removeSustainedNote(midiNote, sampleLocation);
-            else midiNoteToSequencerMap[midiNote]->changeSustain(false, sampleLocation);
+            if (!midiState.isNoteOn(0, midiNote)) midiNoteToSequencerMap[midiNote]->addNoteOff(midiNote);
+            else midiNoteToSequencerMap[midiNote]->changeSustain(message);
         }
     }
 }
 
-void Sequencer::processRandomNoteOn(juce::MidiMessage message, int sampleLocation)
+void Sequencer::processRandomNoteOn(juce::MidiMessage message)
 {
     auto selection = randomSelect(gen);
-    sequencerModules[selection].addNoteOn(message,sampleLocation);
+    sequencerModules[selection].addNoteOn(message);
     midiNoteToSequencerMap[message.getNoteNumber()] = &sequencerModules[selection];
 }
