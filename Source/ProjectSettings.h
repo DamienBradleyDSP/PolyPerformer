@@ -18,6 +18,7 @@ namespace ProjectSettings
 {
     //Functional Settings 
 
+    constexpr int midiChannel = 0;
     constexpr int VoiceLimit = 16;
     constexpr int maxNumberOfRhythmModules = 16;
     constexpr int maxNumberOfBeats = 16;

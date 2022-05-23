@@ -86,9 +86,9 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
         // run algorithm from mode selection (eg. random module selection)
         // assign note on to module
 
-        if (midiState.isNoteOn(0, message.getNoteNumber()))
+        if (midiState.isNoteOn(ProjectSettings::midiChannel, message.getNoteNumber()))
         {
-            MidiMessage noteOff = MidiMessage::noteOff(0,message.getNoteNumber());
+            MidiMessage noteOff = MidiMessage::noteOff(ProjectSettings::midiChannel, message.getNoteNumber());
             midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(noteOff);
         }
         midiState.processNextMidiEvent(message);
@@ -111,7 +111,7 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
         // stop all voices playing that aren't currently on in midiState
         for (int midiNote = 0; midiNote < 128; midiNote++)
         {
-            if (!midiState.isNoteOn(0, midiNote)) midiNoteToSequencerMap[midiNote]->addNoteOff(midiNote);
+            if (!midiState.isNoteOn(ProjectSettings::midiChannel, midiNote)) midiNoteToSequencerMap[midiNote]->addNoteOff(midiNote);
             else midiNoteToSequencerMap[midiNote]->changeSustain(message);
         }
     }
