@@ -166,6 +166,10 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         currentpositionstruct.ppqPositionOfLastBarStart = floor(frameCounter * barspersample) * 4;	// calculates number of quarter notes at start of last bar, 4/4 time
         currentpositionstruct.timeInSamples = frameCounter;
         frameCounter += 480;
+
+        sequencer.initialise(SR, 480);
+        auto message = MidiMessage::noteOn(1, 60, 1.0f);
+        midiMessages.addEvent(message, 0);
         sequencer.generateMidi(midiMessages, currentpositionstruct);
         return;
     } // testing

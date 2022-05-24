@@ -11,14 +11,14 @@
 #include "Sequencer.h"
 
 Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
-    sequencerModules(4,SequencerModule(parameters)), 
+    sequencerModules({new SequencerModule(parameters),new SequencerModule(parameters) ,new SequencerModule(parameters) ,new SequencerModule(parameters) }),
     gen(rd()),
     randomSelect({ 0, 1, 2, 3})
 {
     modeSelect = parameters.getRawParameterValue("modeSelect");
     for (auto&& entry : midiNoteToSequencerMap)
     {
-        entry = &sequencerModules[0];
+        entry = sequencerModules[0];
     }
 }
 
@@ -28,7 +28,7 @@ Sequencer::~Sequencer()
 
 void Sequencer::initialise(double sampleRate, int bufferSize)
 {
-    for (auto&& modu : sequencerModules) modu.initialise(sampleRate, bufferSize);
+    for (auto&& modu : sequencerModules) modu->initialise(sampleRate, bufferSize);
 }
 
 void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
@@ -68,7 +68,7 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     buffer.clear();
     for (auto&& message : incomingMidi) processMidi(message.first, message.second);
 
-    for (auto&& modu : sequencerModules) modu.generateMidi(buffer, playhead);
+    for (auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
 }
 
 void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
@@ -94,7 +94,7 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
         midiState.processNextMidiEvent(message);
 
         // Mode selection
-        if (modeSelect->load() == 0) processRandomNoteOn(message); // Mode 1
+        if (modeSelect->load() == 1) processRandomNoteOn(message); // Mode 1
     }
     else if (message.isNoteOff())
     {
@@ -104,7 +104,7 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
     else if (message.isSustainPedalOn())
     {
         // add sustain flag to all current voices
-        for (auto&& modu : sequencerModules) modu.changeSustain(true);
+        for (auto&& modu : sequencerModules) modu->changeSustain(true);
     }
     else if (message.isSustainPedalOff())
     {
@@ -120,6 +120,6 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
 void Sequencer::processRandomNoteOn(juce::MidiMessage message)
 {
     auto selection = randomSelect(gen);
-    sequencerModules[selection].addNoteOn(message);
-    midiNoteToSequencerMap[message.getNoteNumber()] = &sequencerModules[selection];
+    sequencerModules[0]->addNoteOn(message);
+    midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0];
 }

@@ -30,7 +30,7 @@ public:
 
 private:
 
-    std::vector<MidiVoice> midiVoices;
+    std::vector<MidiVoice*> midiVoices;
     std::list<MidiVoice*> playingVoices; // holds playing voices in order
     std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
     std::list<std::list<MidiVoice*>::iterator> voicesStoppingAtBufferEnd;

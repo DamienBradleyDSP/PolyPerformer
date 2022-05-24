@@ -28,7 +28,7 @@ private:
     void processMidi(juce::MidiMessage message, int sampleLocation);
     void processRandomNoteOn(juce::MidiMessage message);
 
-    std::vector<SequencerModule> sequencerModules; // the four sequencer modules allowed to be used
+    std::vector<SequencerModule*> sequencerModules; // the four sequencer modules allowed to be used
     std::array<SequencerModule*,128> midiNoteToSequencerMap; // maps 128 midi notes to the sequencer using that note VIA pointer
     MidiKeyboardState midiState; // current key state (no sustain pedal included in this class)
 

@@ -11,8 +11,8 @@
 #include "MidiVoice.h"
 
 MidiVoice::MidiVoice(juce::AudioProcessorValueTreeState& parameters) :
-    controller1(parameters),
-    controller2(parameters)
+    controller1(new MidiController(parameters)),
+    controller2(new MidiController(parameters))
 {
 }
 
@@ -24,10 +24,10 @@ void MidiVoice::initialise(double s, int b)
 {
     sampleRate = s;
     bufferSize = b;
-    controller1.initialise(s, b);
-    controller2.initialise(s, b);
+    controller1->initialise(s, b);
+    controller2->initialise(s, b);
     controllerList.clear();
-    controllerList.push_back(&controller1);
+    controllerList.push_back(controller1);
 }
 
 // MIDI VOICE
@@ -61,10 +61,14 @@ void MidiVoice::addBeatMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosi
 
 void MidiVoice::addController()
 {
-    if (controllerList.size() == 1)
+    if (controllerList.size() == 0)
     {
-        if (&controller1 == controllerList.front()) controllerList.push_back(&controller2);
-        else controllerList.push_back(&controller1);
+        controllerList.push_back(controller1);
+    }
+    else if (controllerList.size() == 1)
+    {
+        if (controller1 == controllerList.front()) controllerList.push_back(controller2);
+        else controllerList.push_back(controller1);
     }
     else return;
 }

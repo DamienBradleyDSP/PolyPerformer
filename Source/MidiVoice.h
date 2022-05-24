@@ -44,8 +44,8 @@ private:
     bool sustainedVoice = false;
 
     // Midi Controllers
-    MidiController controller1;
-    MidiController controller2;
+    MidiController* controller1;
+    MidiController* controller2;
     std::list<MidiController*> controllerList;
 
 };

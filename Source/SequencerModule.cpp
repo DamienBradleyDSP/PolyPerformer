@@ -10,11 +10,11 @@
 
 #include "SequencerModule.h"
 
-SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters) :
-    midiVoices(ProjectSettings::VoiceLimit,MidiVoice(parameters))
+SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
 {
-    for (auto&& voice : midiVoices) nonPlayingVoices.push(&voice);
-    for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(&voice,-1));
+    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(new MidiVoice(parameters));
+    for (auto&& voice : midiVoices) nonPlayingVoices.push(voice);
+    for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(voice,-1));
 
     for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++)
     {
@@ -29,7 +29,7 @@ SequencerModule::~SequencerModule()
 
 void SequencerModule::initialise(double s, int b)
 {
-    for (auto&& voice : midiVoices) voice.initialise(s,b);
+    for (auto&& voice : midiVoices) voice->initialise(s,b);
 }
 
 void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
@@ -38,7 +38,7 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
     //!!!!!!!!!!!!!!!!
     bars totalNumberOfBars = barOffset; // replace with offset stat
-    for (auto&& modu : rhythmModules) modu.getNumberOfBars(totalNumberOfBars);
+    //for (auto&& modu : rhythmModules) modu.getNumberOfBars(totalNumberOfBars);
 
     // calculate current sample range for buffer and get bar location
 
@@ -61,8 +61,9 @@ void SequencerModule::addNoteOn(juce::MidiMessage message)
         {
             mapVoiceToNote[voice] = message.getNoteNumber();
             voice->midiInputMessage(message);
+            auto voicePointer = voice;
             playingVoices.remove(voice);
-            playingVoices.push_back(voice);
+            playingVoices.push_back(voicePointer);
             return;
         }
     }
