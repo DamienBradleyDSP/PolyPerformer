@@ -31,8 +31,6 @@
             file="Source/MidiController.cpp"/>
       <FILE id="UGCDRg" name="MidiController.h" compile="0" resource="0"
             file="Source/MidiController.h"/>
-      <FILE id="GtAnSl" name="MidiVoice.cpp" compile="1" resource="0" file="Source/MidiVoice.cpp"/>
-      <FILE id="TqeGtF" name="MidiVoice.h" compile="0" resource="0" file="Source/MidiVoice.h"/>
       <FILE id="Od9IGJ" name="ProjectSettings.h" compile="0" resource="0"
             file="Source/ProjectSettings.h"/>
       <FILE id="k5ghU1" name="Beat.cpp" compile="1" resource="0" file="Source/Beat.cpp"/>

@@ -12,13 +12,13 @@
 
 SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
 {
-    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(new MidiVoice(parameters));
-    for (auto&& voice : midiVoices) nonPlayingVoices.push(voice);
-    for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(voice,-1));
+    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiController>(new MidiController(parameters)));
+    for (auto&& voice : midiVoices) nonPlayingVoices.push(voice.get());
+    for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(voice.get(),-1));
 
     for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++)
     {
-        rhythmModules.push_back(RhythmModule(parameters, i));
+        rhythmModules.push_back(std::unique_ptr<RhythmModule>(new RhythmModule(parameters,i)));
     }
 
 }
@@ -38,70 +38,24 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
     //!!!!!!!!!!!!!!!!
     bars totalNumberOfBars = barOffset; // replace with offset stat
-    //for (auto&& modu : rhythmModules) modu.getNumberOfBars(totalNumberOfBars);
+    for (auto&& modu : rhythmModules) modu->getNumberOfBars(totalNumberOfBars);
 
     // calculate current sample range for buffer and get bar location
 
-    for (auto voice : playingVoices) voice->prepareMidiControllers(playhead, totalNumberOfBars);
-    for (auto&& rModule : rhythmModules) rModule.generateMidi(playingVoices);
-    for (auto voice : playingVoices) voice->addMidiToBuffer(buffer);
-
-    for (auto&& voice : voicesStoppingAtBufferEnd)
-    {
-        nonPlayingVoices.push(*voice);
-        playingVoices.erase(voice);
-    }
+    midiVoices[0]->calculateBufferSamples(playhead, totalNumberOfBars);
+    for (auto&& rModule : rhythmModules) rModule->generateMidi(midiVoices[0]);
+    midiVoices[0]->applyMidiMessages(buffer);
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
-    for (auto&& voice : playingVoices)
-    {
-        if (message.getNoteNumber() == mapVoiceToNote[voice])
-        {
-            mapVoiceToNote[voice] = message.getNoteNumber();
-            voice->midiInputMessage(message);
-            auto voicePointer = voice;
-            playingVoices.remove(voice);
-            playingVoices.push_back(voicePointer);
-            return;
-        }
-    }
-    if (playingVoices.size() != ProjectSettings::VoiceLimit)
-    {
-        // register note on with non playing voice, remove from non playing voice and push on to playing voice at back
-        auto newVoice = nonPlayingVoices.front();
-        mapVoiceToNote[newVoice] = message.getNoteNumber();
-        nonPlayingVoices.pop();
-        newVoice->midiInputMessage(message);
-        playingVoices.push_back(newVoice);
-    }
-    else
-    {
-        // register note on with first playing voice, remove and push to back
-        auto oldVoice = playingVoices.front();
-        mapVoiceToNote[oldVoice] = message.getNoteNumber();
-        oldVoice->midiInputMessage(message);
-        playingVoices.push_back(oldVoice);
-        playingVoices.pop_front();
-    }
+
 }
 
 void SequencerModule::addNoteOff(juce::MidiMessage message)
 {
-    for (auto voiceIterator = playingVoices.begin(); voiceIterator!=playingVoices.end(); voiceIterator++)
-    {
-        if (mapVoiceToNote[*voiceIterator] != message.getNoteNumber()) continue;
-
-        if(!(*voiceIterator)->midiInputMessage(message)) return;
-
-        mapVoiceToNote[*voiceIterator] = -1;
-        voicesStoppingAtBufferEnd.push_back(voiceIterator);
-        return;
-    }
 }
 
 void SequencerModule::changeSustain(juce::MidiMessage message)
 {
-    for (auto&& voice : playingVoices) voice->midiInputMessage(message);
 }

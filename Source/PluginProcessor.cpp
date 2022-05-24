@@ -96,6 +96,7 @@ void PolyPerformerAudioProcessor::changeProgramName (int index, const juce::Stri
 void PolyPerformerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     srate = sampleRate;
+    buff = samplesPerBlock;
     sequencer.initialise(sampleRate, samplesPerBlock);
 }
 
@@ -144,8 +145,6 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
 
     if (currentplayhead != nullptr) {		// checks if plugin is being run from DAW host
         currentplayhead->getCurrentPosition(currentpositionstruct);
-        sequencer.initialise(srate, buffer.getNumSamples());
-        sequencer.generateMidi(midiMessages, currentpositionstruct);
     }
     else // TESTING
     {
@@ -167,12 +166,17 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         currentpositionstruct.timeInSamples = frameCounter;
         frameCounter += 480;
 
-        sequencer.initialise(SR, 480);
+        //sequencer.initialise(SR, 480);
         auto message = MidiMessage::noteOn(1, 60, 1.0f);
         midiMessages.addEvent(message, 0);
         sequencer.generateMidi(midiMessages, currentpositionstruct);
         return;
     } // testing
+
+    if (currentpositionstruct.isPlaying == true) {
+        sequencer.generateMidi(midiMessages, currentpositionstruct); // generate midi for buffer using current playead from host
+    }
+    else sequencer.initialise(srate, buff);
 
 }
 

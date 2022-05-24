@@ -2,7 +2,7 @@
   ==============================================================================
 
     Beat.h
-    Created: 11 May 2022 2:50:05pm
+    Created: 25 Oct 2021 3:55:25pm
     Author:  Damien
 
   ==============================================================================
@@ -11,18 +11,18 @@
 #pragma once
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
-#include "MidiVoice.h"
+#include "MidiController.h"
 
 class Beat
 {
 public:
-    Beat() = delete;
+    Beat()=delete;
     Beat(juce::AudioProcessorValueTreeState& parameters, int rhythmNumber, int beatNumber);
     ~Beat();
 
     void setBarPositionLength(bars barPosition, bars length);
 
-    void applyMidiMessages(std::list<MidiVoice*>& voices, bars lastModuleBarEnding);
+    void applyMidiMessages(std::unique_ptr<MidiController>& midiController, bars lastModuleBarEnding);
 private:
 
     const int rhythmNumber; // 
@@ -34,7 +34,7 @@ private:
     juce::MidiMessage noteOn;
     juce::MidiMessage noteOff;
     juce::MidiMessage allNotesOff;
-
+    
     // User params
     std::atomic<float>* onState;
     std::atomic<float>* velocity;

@@ -2,7 +2,7 @@
   ==============================================================================
 
     MidiController.h
-    Created: 11 May 2022 2:48:26pm
+    Created: 24 Oct 2021 4:19:29pm
     Author:  Damien
 
   ==============================================================================
@@ -12,6 +12,12 @@
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
 
+// This handles the buffer portion of maths, that is to say, the sample locations fall within a particular buffer length
+// the rest of the sequencer should have no knowledge of the buffer, only specific sample locations
+
+// The sample location will be calculated and then each will be checked every buffer
+// if the sample location is within the buffer, the midimessage is loaded and a new sample location is calculated for that beat
+
 class MidiController
 {
 public:
@@ -19,35 +25,21 @@ public:
     MidiController(juce::AudioProcessorValueTreeState& parameters);
     ~MidiController();
 
-    // MidiVoice Interface
+    // Sequencer Interface
     void initialise(double sampleRate, int bufferSize);
-    void controllerTurningOn(MidiMessage message);
-    void controllerTurningOff(MidiMessage message);
     void calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumberOfBars);
     void applyMidiMessages(juce::MidiBuffer& buffer);
-    void copyMidiList(MidiController* controllerToCopy);
 
     // Beat Interface
-    void addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
+    void addMidiMessage(juce::MidiMessage const& noteOnMessage,bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain=false);
 
-    // MidiController Interface
-    void getDelayedMessages(std::list<std::pair<juce::MidiMessage, bars>>& noteOffMessages,
-                            std::list<juce::MidiMessage>& sustainedMidiMessages);
 
 private:
-
-    // MESSAGE / RHYTHM RESET TRACK
-    bool resetNoteStart = false;
-    bool turningOn = false;
-    bool turningOff = false;
-    int samplesToNoteReset = 0;
-    MidiMessage message;
-    void applyMessageChanges(juce::MidiMessage& message);
-    //___________________________
 
     void checkNoteOffMessages();
     int getLocation(bars barPosition);
 
+    std::shared_ptr<juce::AudioProcessorValueTreeState> params;
     double sampleRate;
     int bufferLength;
     samples samplesFromRhythmStart;
@@ -61,8 +53,10 @@ private:
     bool sampleOverspill = false;
 
     std::list<std::pair<juce::MidiMessage, samples>> bufferMidiMessages;
+
     std::list<std::pair<juce::MidiMessage, bars>> noteOffMessages;
     std::list<juce::MidiMessage> sustainedMidiMessages;
 
     bool sustainToNextNote = false;
+
 };

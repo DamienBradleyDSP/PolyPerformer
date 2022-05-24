@@ -11,14 +11,19 @@
 #include "Sequencer.h"
 
 Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
-    sequencerModules({new SequencerModule(parameters),new SequencerModule(parameters) ,new SequencerModule(parameters) ,new SequencerModule(parameters) }),
     gen(rd()),
     randomSelect({ 0, 1, 2, 3})
 {
+    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
+    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
+    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
+    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
+
+
     modeSelect = parameters.getRawParameterValue("modeSelect");
     for (auto&& entry : midiNoteToSequencerMap)
     {
-        entry = sequencerModules[0];
+        entry = sequencerModules[0].get();
     }
 }
 
@@ -121,5 +126,5 @@ void Sequencer::processRandomNoteOn(juce::MidiMessage message)
 {
     auto selection = randomSelect(gen);
     sequencerModules[0]->addNoteOn(message);
-    midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0];
+    midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0].get();
 }

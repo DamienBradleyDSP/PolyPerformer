@@ -11,7 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
-#include "MidiVoice.h"
+#include "MidiController.h"
 #include "RhythmModule.h"
 
 class SequencerModule
@@ -30,13 +30,13 @@ public:
 
 private:
 
-    std::vector<MidiVoice*> midiVoices;
-    std::list<MidiVoice*> playingVoices; // holds playing voices in order
-    std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
-    std::list<std::list<MidiVoice*>::iterator> voicesStoppingAtBufferEnd;
-    std::map<MidiVoice*, int> mapVoiceToNote;
+    std::vector<std::unique_ptr<MidiController>> midiVoices;
+    std::list<MidiController*> playingVoices; // holds playing voices in order
+    std::queue<MidiController*> nonPlayingVoices; // holds non-playing voices
+    std::list<MidiController*> voicesStopping; // holds voices that are soon stopping
+    std::map<MidiController*, int> mapVoiceToNote;
 
-    std::vector<RhythmModule> rhythmModules;
+    std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
     bars barOffset = 0;
 };

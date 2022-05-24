@@ -2,7 +2,7 @@
   ==============================================================================
 
     Beat.cpp
-    Created: 11 May 2022 2:50:05pm
+    Created: 25 Oct 2021 3:55:25pm
     Author:  Damien
 
   ==============================================================================
@@ -10,10 +10,17 @@
 
 #include "Beat.h"
 
-Beat::Beat(juce::AudioProcessorValueTreeState& parameters, int rhythmNumber, int beatNumber) :
-    rhythmNumber(rhythmNumber),
-    beatNumber(beatNumber)
+Beat::Beat(juce::AudioProcessorValueTreeState& parameters, int rnum, int bnum)
+    : rhythmNumber(rnum), beatNumber(bnum)
 {
+    onState = new std::atomic<float>(1);
+    velocity = new std::atomic<float>(1);
+    noteLength = new std::atomic<float>(1);
+    midiNote = new std::atomic<float>(72);
+    midiSemitone = new std::atomic<float>(0);
+    midiOctave = new std::atomic<float>(1);
+    sustain = new std::atomic<float>(0);
+
     noteOn = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, midiNote->load(), 1.0f);
     noteOff = juce::MidiMessage::noteOff(ProjectSettings::midiChannel, midiNote->load());
     allNotesOff = juce::MidiMessage::allNotesOff(ProjectSettings::midiChannel);
@@ -29,7 +36,7 @@ void Beat::setBarPositionLength(bars barPosition, bars length)
     beatLength = length;
 }
 
-void Beat::applyMidiMessages(std::list<MidiVoice*>& voices, bars lastModuleBarEnding)
+void Beat::applyMidiMessages(std::unique_ptr<MidiController>& midiController, bars lastModuleBarEnding)
 {
     if (!onState->load()) return;
 
@@ -39,5 +46,5 @@ void Beat::applyMidiMessages(std::list<MidiVoice*>& voices, bars lastModuleBarEn
 
     noteOn.setVelocity(velocity->load());
 
-    for(auto&& voice : voices) voice->addBeatMessage(noteOn, lastModuleBarEnding + beatPosition, noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(), sustain->load());
+    midiController->addMidiMessage(noteOn, lastModuleBarEnding + beatPosition,noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(),sustain->load());
 }
