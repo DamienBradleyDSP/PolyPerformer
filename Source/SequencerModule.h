@@ -12,6 +12,7 @@
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
 #include "MidiController.h"
+#include "MidiVoice.h"
 #include "RhythmModule.h"
 
 class SequencerModule
@@ -30,15 +31,12 @@ public:
 
 private:
 
-    std::vector<std::unique_ptr<MidiController>> midiVoices;
-    std::list<MidiController*> playingVoices; // holds playing voices in order
-    std::queue<MidiController*> nonPlayingVoices; // holds non-playing voices
-    std::list<MidiController*> voicesStopping; // holds voices that are soon stopping
-    std::map<MidiController*, int> mapVoiceToNote;
+    std::vector<std::unique_ptr<MidiVoice>> midiVoices;
+    std::list<MidiVoice*> playingVoices; // holds playing voices in order
+    std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
+    std::array<MidiVoice*, 128> midiNoteToSequencerMap;
 
     std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
     bars barOffset = 0;
-
-    bool noteOn = false;
 };

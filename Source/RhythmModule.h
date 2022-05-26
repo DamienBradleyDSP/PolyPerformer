@@ -11,7 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
-#include "MidiController.h"
+#include "MidiVoice.h"
 #include "Beat.h"
 
 // Rhythm module is accessed in a tracked cycle, freeform based on the sample locaiton and distance from last point
@@ -24,7 +24,7 @@ public:
     RhythmModule(juce::AudioProcessorValueTreeState& parameters, int rhythmNumber);
     ~RhythmModule();
 
-    void generateMidi(std::unique_ptr<MidiController>& midiController);
+    void generateMidi(std::list<MidiVoice*>& voices);
     void getNumberOfBars(bars& runningBarTotal);
 
     const int rhythmNumber;

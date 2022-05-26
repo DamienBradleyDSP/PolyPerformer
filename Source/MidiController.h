@@ -30,16 +30,18 @@ public:
     void applyMidiMessages(juce::MidiBuffer& buffer);
 
     // Beat Interface
-    void addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain = false);
-    //virtual void modifyMessage(juce::MidiMessage& message, int sampleLocation) = 0;
+    void addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
+    
+    virtual void modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
 
-    void resetLoop(int sampleLocation);
-
-
+protected:
+    void startLoop(int bufferLocation);
+    void stopLoop(int bufferLocation);
 private:
 
     void checkNoteOffMessages();
     int getLocation(bars barPosition);
+    void flushOldMessages();
 
     std::shared_ptr<juce::AudioProcessorValueTreeState> params;
     double sampleRate;
@@ -62,5 +64,6 @@ private:
     bool sustainToNextNote = false;
 
     bool reset = false;
+    bool stop = true;
     int resetLocation=0;
 };

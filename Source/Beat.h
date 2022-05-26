@@ -11,7 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
-#include "MidiController.h"
+#include "MidiVoice.h"
 
 class Beat
 {
@@ -22,7 +22,7 @@ public:
 
     void setBarPositionLength(bars barPosition, bars length);
 
-    void applyMidiMessages(std::unique_ptr<MidiController>& midiController, bars lastModuleBarEnding);
+    void applyMidiMessages(std::list<MidiVoice*>& midiVoices, bars lastModuleBarEnding);
 private:
 
     const int rhythmNumber; // 

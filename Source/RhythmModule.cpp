@@ -28,7 +28,7 @@ RhythmModule::~RhythmModule()
 {
 }
 
-void RhythmModule::generateMidi(std::unique_ptr<MidiController>& midiController)
+void RhythmModule::generateMidi(std::list<MidiVoice*>& midiVoices)
 {
     if (!moduleOnState->load()) return;
 
@@ -36,7 +36,7 @@ void RhythmModule::generateMidi(std::unique_ptr<MidiController>& midiController)
     for (auto&& beat : beats)
     {
         beat->setBarPositionLength((beatNum - 1) * numberOfBars->load() / numberOfBeats->load(), numberOfBars->load() / numberOfBeats->load());
-        beat->applyMidiMessages(midiController, lastModuleBarEnding);
+        beat->applyMidiMessages(midiVoices, lastModuleBarEnding);
 
         if (beatNum >= ceil(selectedBeats->load())) break;
         beatNum++;

@@ -36,7 +36,7 @@ void Beat::setBarPositionLength(bars barPosition, bars length)
     beatLength = length;
 }
 
-void Beat::applyMidiMessages(std::unique_ptr<MidiController>& midiController, bars lastModuleBarEnding)
+void Beat::applyMidiMessages(std::list<MidiVoice*>& midiVoices, bars lastModuleBarEnding)
 {
     if (!onState->load()) return;
 
@@ -46,5 +46,5 @@ void Beat::applyMidiMessages(std::unique_ptr<MidiController>& midiController, ba
 
     noteOn.setVelocity(velocity->load());
 
-    midiController->addMidiMessage(noteOn, lastModuleBarEnding + beatPosition, noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(), sustain->load());
+    for(auto&& voice : midiVoices) voice->addMidiMessage(noteOn, lastModuleBarEnding + beatPosition, noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(), sustain->load());
 }

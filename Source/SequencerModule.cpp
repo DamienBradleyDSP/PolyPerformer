@@ -12,13 +12,17 @@
 
 SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
 {
-    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiController>(new MidiController));
+    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiVoice>(new MidiVoice(parameters)));
     for (auto&& voice : midiVoices) nonPlayingVoices.push(voice.get());
-    for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(voice.get(),-1));
 
     for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++)
     {
         rhythmModules.push_back(std::unique_ptr<RhythmModule>(new RhythmModule(parameters,i)));
+    }
+
+    for (auto&& entry : midiNoteToSequencerMap)
+    {
+        entry = nullptr;
     }
 
 }
@@ -34,8 +38,6 @@ void SequencerModule::initialise(double s, int b)
 
 void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
 {
-    // For module, if its turned on, add the bars to the total number of bars - ORDER SENSITIVE
-    if (!noteOn) return;
 
     //!!!!!!!!!!!!!!!!
     bars totalNumberOfBars = barOffset; // replace with offset stat
@@ -43,20 +45,50 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
     // calculate current sample range for buffer and get bar location
 
-    midiVoices[0]->calculateBufferSamples(playhead, totalNumberOfBars);
-    for (auto&& rModule : rhythmModules) rModule->generateMidi(midiVoices[0]);
-    midiVoices[0]->applyMidiMessages(buffer);
+    for(auto&& voice : midiVoices) voice->startOfNewBuffer();
+    for (auto&& voice : playingVoices) voice->calculateBufferSamples(playhead, totalNumberOfBars);
+    for (auto&& rModule : rhythmModules) rModule->generateMidi(playingVoices);
+    for (auto&& voice : playingVoices) voice->applyMidiMessages(buffer);
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
-    midiVoices[0]->resetLoop(message.getTimeStamp());
-    noteOn = true;
+    if (midiNoteToSequencerMap[message.getNoteNumber()] != nullptr)
+    {
+        auto voice = midiNoteToSequencerMap[message.getNoteNumber()];
+        voice->noteOn(message);
+        playingVoices.remove(voice);
+        playingVoices.push_back(voice);
+    }
+    else if (nonPlayingVoices.empty())
+    {
+        auto voice = playingVoices.front();
+        voice->noteOn(message);
+        playingVoices.pop_front();
+        playingVoices.push_back(voice);
+        midiNoteToSequencerMap[message.getNoteNumber()] = voice;
+    }
+    else
+    {
+        auto voice = nonPlayingVoices.front();
+        voice->noteOn(message);
+        nonPlayingVoices.pop();
+        playingVoices.push_back(voice);
+        midiNoteToSequencerMap[message.getNoteNumber()] = voice;
+    }
 }
 
 void SequencerModule::addNoteOff(juce::MidiMessage message)
 {
-    noteOn = false;
+    //if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) jassertfalse; // shouldnt be reached
+    if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return; // shouldnt be reached
+    else
+    {
+        midiNoteToSequencerMap[message.getNoteNumber()]->noteOff(message);
+        playingVoices.remove(midiNoteToSequencerMap[message.getNoteNumber()]);
+        nonPlayingVoices.push(midiNoteToSequencerMap[message.getNoteNumber()]);
+        midiNoteToSequencerMap[message.getNoteNumber()] = nullptr;
+    }
 }
 
 void SequencerModule::changeSustain(juce::MidiMessage message)

@@ -173,6 +173,8 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         return;
     } // testing
 
+
+    // PUT IN SOMETHING HERE TO RESET EVERYTHING WHEN DAW PLAYS
     sequencer.generateMidi(midiMessages, currentpositionstruct); // generate midi for buffer using current playead from host
 }
 
