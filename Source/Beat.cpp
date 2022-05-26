@@ -13,15 +13,15 @@
 Beat::Beat(juce::AudioProcessorValueTreeState& parameters, int rnum, int bnum)
     : rhythmNumber(rnum), beatNumber(bnum)
 {
-    onState = new std::atomic<float>(1);
-    velocity = new std::atomic<float>(1);
-    noteLength = new std::atomic<float>(1);
-    midiNote = new std::atomic<float>(72);
-    midiSemitone = new std::atomic<float>(0);
-    midiOctave = new std::atomic<float>(1);
-    sustain = new std::atomic<float>(0);
+    onState = parameters.getRawParameterValue("BeatOnOffR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
+    velocity = parameters.getRawParameterValue("VelocityR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
+    noteLength = parameters.getRawParameterValue("noteLengthR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
+    midiNote = parameters.getRawParameterValue("midiNoteNumber");
+    midiSemitone = parameters.getRawParameterValue("SemitoneR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
+    midiOctave = parameters.getRawParameterValue("OctaveR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
+    sustain = parameters.getRawParameterValue("SustainR" + juce::String(rhythmNumber) + "B" + juce::String(beatNumber));
 
-    noteOn = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, midiNote->load(), 1.0f);
+    noteOn = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, midiNote->load(), (float)ProjectSettings::midiVelocity);
     noteOff = juce::MidiMessage::noteOff(ProjectSettings::midiChannel, midiNote->load());
     allNotesOff = juce::MidiMessage::allNotesOff(ProjectSettings::midiChannel);
 }
@@ -46,5 +46,5 @@ void Beat::applyMidiMessages(std::unique_ptr<MidiController>& midiController, ba
 
     noteOn.setVelocity(velocity->load());
 
-    midiController->addMidiMessage(noteOn, lastModuleBarEnding + beatPosition,noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(),sustain->load());
+    midiController->addMidiMessage(noteOn, lastModuleBarEnding + beatPosition, noteOff, lastModuleBarEnding + beatPosition + beatLength * noteLength->load(), sustain->load());
 }

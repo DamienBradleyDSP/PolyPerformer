@@ -10,7 +10,7 @@
 
 #include "MidiController.h"
 
-MidiController::MidiController(juce::AudioProcessorValueTreeState& parameters)
+MidiController::MidiController()
 {
 }
 
@@ -30,6 +30,7 @@ void MidiController::initialise(double s, int b)
     totalNumberOfBars = 0;
     totalSampleLength = 0;
     sampleOverspill = false;
+    reset = false;
 }
 
 void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumOfBars)
@@ -49,9 +50,17 @@ void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPosition
     oneBarSampleLength = ((4.0 * 60.0) / (double)currentpositionstruct.bpm) * sampleRate;
     totalSampleLength = (totalNumberOfBars / barsPerMinute) * 60.0 * sampleRate; //length in samples of the total number of bars spanned by the given rhythm modules
 
- 
-
-    if ((samplesFromRhythmStart + (double)bufferLength) > totalSampleLength)
+    if (reset) // User has pressed a note
+    {
+        sampleSpan.first = samplesFromRhythmStart;
+        sampleSpan.second = samplesFromRhythmStart + resetLocation;
+        sampleSpanOverspill.first = 0;
+        sampleSpanOverspill.second = bufferLength - resetLocation;
+        sampleOverspill = true;
+        samplesFromRhythmStart = sampleSpanOverspill.second;
+        reset = false;
+    }
+    else if ((samplesFromRhythmStart + (double)bufferLength) > totalSampleLength) // The loop is resetting during buffer
     {
         sampleSpan.first = samplesFromRhythmStart;
         sampleSpan.second = totalSampleLength;
@@ -61,10 +70,10 @@ void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPosition
 
         samplesFromRhythmStart = 0 + sampleSpanOverspill.second;
     }
-    else
+    else 
     {
         sampleSpan.first = samplesFromRhythmStart;
-        sampleSpan.second = samplesFromRhythmStart+bufferLength;
+        sampleSpan.second = samplesFromRhythmStart + bufferLength;
         sampleSpanOverspill.first = -1;
         sampleSpanOverspill.second = -1;
         sampleOverspill = false;
@@ -91,6 +100,7 @@ void MidiController::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars
     // Currently checks twice but why
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
+
     bufferMidiMessages.push_back(std::make_pair(noteOnMessage, noteOnSampleLocation));
 
     if (sustainToNextNote)
@@ -102,7 +112,7 @@ void MidiController::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars
         sustainedMidiMessages.clear();
         sustainToNextNote = false;
     }
-   
+
     if (sustain)
     {
         sustainedMidiMessages.push_back(noteOffMessage);
@@ -111,9 +121,15 @@ void MidiController::addMidiMessage(juce::MidiMessage const& noteOnMessage, bars
     else noteOffMessages.push_back(std::make_pair(noteOffMessage, noteOffPosition));
 }
 
+void MidiController::resetLoop(int sampleLocation)
+{
+    reset = true;
+    resetLocation = sampleLocation;
+}
+
 void MidiController::checkNoteOffMessages()
 {
-    auto copyOfMessages{noteOffMessages};
+    auto copyOfMessages{ noteOffMessages };
     noteOffMessages.clear();
     for (auto&& message : copyOfMessages)
     {

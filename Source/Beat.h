@@ -16,7 +16,7 @@
 class Beat
 {
 public:
-    Beat()=delete;
+    Beat() = delete;
     Beat(juce::AudioProcessorValueTreeState& parameters, int rhythmNumber, int beatNumber);
     ~Beat();
 
@@ -34,7 +34,7 @@ private:
     juce::MidiMessage noteOn;
     juce::MidiMessage noteOff;
     juce::MidiMessage allNotesOff;
-    
+
     // User params
     std::atomic<float>* onState;
     std::atomic<float>* velocity;

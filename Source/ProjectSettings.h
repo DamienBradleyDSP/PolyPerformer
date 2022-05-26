@@ -18,8 +18,29 @@ namespace ProjectSettings
 {
     //Functional Settings 
 
-    constexpr int midiChannel = 1;
+    //constexpr int midiChannel = 1;
     constexpr int VoiceLimit = 16;
-    constexpr int maxNumberOfRhythmModules = 16;
-    constexpr int maxNumberOfBeats = 16;
+
+
+
+
+
+
+
+	constexpr int startingNumberOfBeats = 4;
+	constexpr int startingNumberOfBars = 1;
+	constexpr int startingSemitone = 0;
+	constexpr int startingOctave = 0;
+	constexpr int startingNumberOfRhythmModules = 1;
+	constexpr int minNumberOfRhythmModules = 1;
+	constexpr int maxNumberOfRhythmModules = 32;
+	constexpr int minNumberOfBeats = 1;
+	constexpr int maxNumberOfBeats = 32;
+	constexpr int minNumberOfBars = 1;
+	constexpr int maxNumberOfBars = 8;
+
+
+	constexpr int midiChannel = 1;
+	constexpr int midiNote = 36;
+	constexpr float midiVelocity = 0.5;
 };

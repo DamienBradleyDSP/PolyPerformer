@@ -173,11 +173,7 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         return;
     } // testing
 
-    if (currentpositionstruct.isPlaying == true) {
-        sequencer.generateMidi(midiMessages, currentpositionstruct); // generate midi for buffer using current playead from host
-    }
-    else sequencer.initialise(srate, buff);
-
+    sequencer.generateMidi(midiMessages, currentpositionstruct); // generate midi for buffer using current playead from host
 }
 
 //==============================================================================
@@ -240,6 +236,269 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor:
         /*Discrete*/ true,
         /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
         /*Boolean*/ false));
+
+    //return layout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //POLYKOL
+
+    //AudioProcessorValueTreeState::ParameterLayout layout;
+
+    // Sequencer / Global Parameters
+
+    
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "numberOfModules",
+        /*paramName*/ "numberOfModules",
+        /*LabelText*/ "numberOfModules",
+        /*Min,max, optional:precision*/ juce::NormalisableRange<float>(ProjectSettings::minNumberOfRhythmModules, ProjectSettings::maxNumberOfRhythmModules, 1),
+        /*Default/Initial value*/ ProjectSettings::startingNumberOfRhythmModules,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ true,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ false));
+    //parameterList.push_back(juce::String("numberOfModules"));
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "midiNoteNumber",
+        /*paramName*/ "midiNoteNumber",
+        /*LabelText*/ "midiNoteNumber",
+        /*Min,max, optional:precision*/ juce::Range<float>(1, 127),
+        /*Default/Initial value*/ ProjectSettings::midiNote,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ true,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ false));
+    //parameterList.push_back(juce::String("midiNoteNumber"));
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "resetLoop",
+        /*paramName*/ "resetLoop",
+        /*LabelText*/ "resetLoop",
+        /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1),
+        /*Default/Initial value*/ 0,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ true,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ true));
+    //parameterList.push_back(juce::String("resetLoop"));
+
+    layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+        /*ParamID*/ "barOffset",
+        /*paramName*/ "barOffset",
+        /*LabelText*/ "barOffset",
+        /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 16, 0.00001),
+        /*Default/Initial value*/ 0,
+        /*value to text func*/ nullptr,
+        /*text to value func*/ nullptr,
+        /*isMetaParameter*/ false,
+        /*Automatable*/ false,
+        /*Discrete*/ false,
+        /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+        /*Boolean*/ false));
+    //parameterList.push_back(juce::String("barOffset"));
+
+    // Rhythm Specific Parameters
+
+    for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++) // +1 for parameter move operations on gui side
+    {
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            "numberOfBeats" + juce::String(i),
+            "numberOfBeats",
+            "numberOfBeats",
+            juce::NormalisableRange<float>(ProjectSettings::minNumberOfBeats, ProjectSettings::maxNumberOfBeats),
+            ProjectSettings::startingNumberOfBeats,
+            nullptr,
+            nullptr,
+            false,
+            true,
+            false,
+            juce::AudioProcessorParameter::Category::genericParameter,
+            false));
+        //parameterList.push_back(juce::String("numberOfBeats" + juce::String(i)));
+
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            "numberOfBars" + juce::String(i),
+            "numberOfBars",
+            "numberOfBars",
+            juce::NormalisableRange<float>(ProjectSettings::minNumberOfBars, ProjectSettings::maxNumberOfBars),
+            ProjectSettings::startingNumberOfBars,
+            nullptr,
+            nullptr,
+            false,
+            true,
+            false,
+            juce::AudioProcessorParameter::Category::genericParameter,
+            false));
+        //parameterList.push_back(juce::String("numberOfBars" + juce::String(i)));
+
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            "selectionOfBeats" + juce::String(i),
+            "selectionOfBeats",
+            "selectionOfBeats",
+            juce::NormalisableRange<float>(ProjectSettings::minNumberOfBeats, ProjectSettings::maxNumberOfBeats),
+            ProjectSettings::startingNumberOfBeats,
+            nullptr,
+            nullptr,
+            false,
+            true,
+            false,
+            juce::AudioProcessorParameter::Category::genericParameter,
+            false));
+        //parameterList.push_back(juce::String("selectionOfBeats" + juce::String(i)));
+
+        auto onState = i >= ProjectSettings::startingNumberOfRhythmModules ? 0 : 1;
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            "moduleTurnedOn" + juce::String(i),
+            "moduleTurnedOn",
+            "moduleTurnedOn",
+            juce::NormalisableRange<float>(0, 1),
+            onState,
+            nullptr,
+            nullptr,
+            false,
+            true,
+            true,
+            juce::AudioProcessorParameter::Category::genericParameter,
+            false));
+        //parameterList.push_back(juce::String("moduleTurnedOn" + juce::String(i)));
+
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            "moduleReadOrder" + juce::String(i),
+            "moduleReadOrder",
+            "moduleReadOrder",
+            juce::NormalisableRange<float>(0, ProjectSettings::maxNumberOfRhythmModules),
+            i,
+            nullptr,
+            nullptr,
+            false,
+            true,
+            true,
+            juce::AudioProcessorParameter::Category::genericParameter,
+            true));
+        //parameterList.push_back(juce::String("moduleReadOrder" + juce::String(i)));
+
+    }
+
+    // Beat Specific Parameters
+
+    for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++) // +1 for parameter move operations on gui side
+    {
+        for (int j = 1; j <= ProjectSettings::maxNumberOfBeats; j++)
+        {
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "BeatOnOffR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "BeatOnOff",
+                /*LabelText*/ "BeatOnOff",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1),
+                /*Default/Initial value*/ 1,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ true,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ true));
+            //parameterList.push_back(juce::String("BeatOnOffR" + juce::String(i) + "B" + juce::String(j)));
+
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "VelocityR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "Velocity",
+                /*LabelText*/ "Velocity",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1),
+                /*Default/Initial value*/ 0.8,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ false,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ false));
+            //parameterList.push_back(juce::String("VelocityR" + juce::String(i) + "B" + juce::String(j)));
+
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "noteLengthR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "noteLength",
+                /*LabelText*/ "noteLength",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1),
+                /*Default/Initial value*/ 0.5,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ false,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ false));
+            //parameterList.push_back(juce::String("noteLengthR" + juce::String(i) + "B" + juce::String(j)));
+
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "SemitoneR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "Semitone",
+                /*LabelText*/ "Semitone",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(-12, 12),
+                /*Default/Initial value*/ 0,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ true,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ false));
+            //parameterList.push_back(juce::String("SemitoneR" + juce::String(i) + "B" + juce::String(j)));
+
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "OctaveR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "Octave",
+                /*LabelText*/ "Octave",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(-4, 4),
+                /*Default/Initial value*/ 0,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ true,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ false));
+            //parameterList.push_back(juce::String("OctaveR" + juce::String(i) + "B" + juce::String(j)));
+
+            layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+                /*ParamID*/ "SustainR" + juce::String(i) + "B" + juce::String(j),
+                /*paramName*/ "Sustain",
+                /*LabelText*/ "Sustain",
+                /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1),
+                /*Default/Initial value*/ 0,
+                /*value to text func*/ nullptr,
+                /*text to value func*/ nullptr,
+                /*isMetaParameter*/ false,
+                /*Automatable*/ true,
+                /*Discrete*/ true,
+                /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+                /*Boolean*/ true));
+            //parameterList.push_back(juce::String("SustainR" + juce::String(i) + "B" + juce::String(j)));
+        }
+    }
 
     return layout;
 }

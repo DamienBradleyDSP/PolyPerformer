@@ -67,16 +67,13 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     MidiBuffer::Iterator i(buffer);
     int sampleLocation;
     while (i.getNextEvent(nullMessage, sampleLocation)) incomingMidi.push_back(std::make_pair(nullMessage, sampleLocation));
-    // sustain -> manually add notes to an array - these are notes currently held down??
-    //for (auto&& modu : sequencerModules) modu.generateMidi(buffer, playhead);
-
     buffer.clear();
-    for (auto&& message : incomingMidi) processMidi(message.first, message.second);
 
+    for (auto&& message : incomingMidi) processIncomingMidi(message.first, message.second);
     for (auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
 }
 
-void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
+void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocation)
 {
     // Each sequencer needs multiple voices!!
 
@@ -93,8 +90,8 @@ void Sequencer::processMidi(juce::MidiMessage message, int sampleLocation)
 
         if (midiState.isNoteOn(ProjectSettings::midiChannel, message.getNoteNumber()))
         {
-            MidiMessage noteOff = MidiMessage::noteOff(ProjectSettings::midiChannel, message.getNoteNumber());
-            midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(noteOff);
+            //MidiMessage noteOff = MidiMessage::noteOff(ProjectSettings::midiChannel, message.getNoteNumber());
+            //midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(noteOff);
         }
         midiState.processNextMidiEvent(message);
 

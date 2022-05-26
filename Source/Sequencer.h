@@ -25,7 +25,7 @@ public:
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
 
 private:
-    void processMidi(juce::MidiMessage message, int sampleLocation);
+    void processIncomingMidi(juce::MidiMessage message, int sampleLocation);
     void processRandomNoteOn(juce::MidiMessage message);
 
     std::vector<std::unique_ptr<SequencerModule>> sequencerModules; // the four sequencer modules allowed to be used

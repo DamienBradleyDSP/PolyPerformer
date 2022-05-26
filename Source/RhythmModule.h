@@ -32,6 +32,7 @@ public:
 private:
     bars calculateBarSpan();
 
+    std::shared_ptr<juce::AudioProcessorValueTreeState> parameters;
     std::vector<std::unique_ptr<Beat>> beats;
 
     bars lastModuleBarEnding = 0;
@@ -39,6 +40,6 @@ private:
     // GUI Params
     std::atomic<float>* moduleOnState;
     std::atomic<float>* numberOfBeats;
-    std::atomic<float>* numberOfBars; 
-    std::atomic<float>* selectedBeats; 
+    std::atomic<float>* numberOfBars;
+    std::atomic<float>* selectedBeats;
 };

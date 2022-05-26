@@ -21,8 +21,7 @@
 class MidiController
 {
 public:
-    MidiController() = delete;
-    MidiController(juce::AudioProcessorValueTreeState& parameters);
+    MidiController();
     ~MidiController();
 
     // Sequencer Interface
@@ -31,7 +30,10 @@ public:
     void applyMidiMessages(juce::MidiBuffer& buffer);
 
     // Beat Interface
-    void addMidiMessage(juce::MidiMessage const& noteOnMessage,bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain=false);
+    void addMidiMessage(juce::MidiMessage const& noteOnMessage, bars noteOnPosition, juce::MidiMessage const& noteOffMessage, bars noteOffPosition, bool sustain = false);
+    //virtual void modifyMessage(juce::MidiMessage& message, int sampleLocation) = 0;
+
+    void resetLoop(int sampleLocation);
 
 
 private:
@@ -59,4 +61,6 @@ private:
 
     bool sustainToNextNote = false;
 
+    bool reset = false;
+    int resetLocation=0;
 };

@@ -39,4 +39,6 @@ private:
     std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
     bars barOffset = 0;
+
+    bool noteOn = false;
 };

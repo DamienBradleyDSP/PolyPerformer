@@ -12,7 +12,7 @@
 
 SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
 {
-    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiController>(new MidiController(parameters)));
+    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiController>(new MidiController));
     for (auto&& voice : midiVoices) nonPlayingVoices.push(voice.get());
     for (auto&& voice : midiVoices) mapVoiceToNote.insert(std::make_pair(voice.get(),-1));
 
@@ -35,6 +35,7 @@ void SequencerModule::initialise(double s, int b)
 void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
 {
     // For module, if its turned on, add the bars to the total number of bars - ORDER SENSITIVE
+    if (!noteOn) return;
 
     //!!!!!!!!!!!!!!!!
     bars totalNumberOfBars = barOffset; // replace with offset stat
@@ -49,11 +50,13 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
-
+    midiVoices[0]->resetLoop(message.getTimeStamp());
+    noteOn = true;
 }
 
 void SequencerModule::addNoteOff(juce::MidiMessage message)
 {
+    noteOn = false;
 }
 
 void SequencerModule::changeSustain(juce::MidiMessage message)
