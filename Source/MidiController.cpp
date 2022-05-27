@@ -102,8 +102,7 @@ void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteO
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
 
-    if (!generateNotes()) return;
-    modifyMessage(noteOnMessage, noteOnSampleLocation);
+    if(modifyMessage(noteOnMessage, noteOnSampleLocation) == false) return;
     modifyMessage(noteOffMessage, noteOnSampleLocation);
 
     bufferMidiMessages.push_back(std::make_pair(noteOnMessage, noteOnSampleLocation));
@@ -159,7 +158,7 @@ int MidiController::getLocation(bars barPosition)
     }
     if (sampleLocation >= sampleSpanOverspill.first && sampleLocation < sampleSpanOverspill.second)
     {
-        return std::round(sampleLocation);
+        return std::round(bufferLength-sampleSpanOverspill.second+sampleLocation);
     }
     else return -1;
 }
