@@ -31,8 +31,12 @@ public:
 
 private:
 
+    double sampleRate;
+    int bufferSize;
+
     std::vector<std::unique_ptr<MidiVoice>> midiVoices;
     std::list<MidiVoice*> playingVoices; // holds playing voices in order
+    std::queue<MidiVoice*> stoppingVoices; // holds voices that have note off triggered
     std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
     std::array<MidiVoice*, 128> midiNoteToSequencerMap;
 

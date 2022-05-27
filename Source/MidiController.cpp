@@ -31,7 +31,6 @@ void MidiController::initialise(double s, int b)
     totalSampleLength = 0;
     sampleOverspill = false;
     reset = false;
-    stop = true;
 }
 
 void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPositionInfo& currentpositionstruct, bars totalNumOfBars)
@@ -53,7 +52,6 @@ void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPosition
 
     if (reset) // User has pressed a note
     {
-        if (resetLocation == 0) resetLocation = 1; // Offsetting by a sample due to note Off flushing becoming a problem at the exact start of a new buffer
         sampleSpan.first = -1;
         sampleSpan.second = -1;
         sampleSpanOverspill.first = 0;
@@ -61,16 +59,6 @@ void MidiController::calculateBufferSamples(juce::AudioPlayHead::CurrentPosition
         sampleOverspill = true;
         samplesFromRhythmStart = sampleSpanOverspill.second;
         reset = false;
-        flushOldMessages();
-    }
-    else if (stop)
-    {
-        if (resetLocation == 0) resetLocation = 1; // Offsetting by a sample due to note Off flushing becoming a problem at the exact start of a new buffer
-        sampleSpan.first = -1;
-        sampleSpan.second = -1;
-        sampleSpanOverspill.first = -1;
-        sampleSpanOverspill.second = -1;
-        sampleOverspill = false;
         flushOldMessages();
     }
     else if ((samplesFromRhythmStart + (double)bufferLength) > totalSampleLength) // The loop is resetting during buffer
@@ -110,11 +98,11 @@ void MidiController::applyMidiMessages(juce::MidiBuffer& buffer)
 
 void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain)
 {
-    if (stop) return;
-
     // Currently checks twice but why
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
+
+    if (!generateNotes()) return;
     modifyMessage(noteOnMessage, noteOnSampleLocation);
     modifyMessage(noteOffMessage, noteOnSampleLocation);
 
@@ -138,17 +126,9 @@ void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteO
     else noteOffMessages.push_back(std::make_pair(noteOffMessage, noteOffPosition));
 }
 
-void MidiController::startLoop(int bufferLocation)
+void MidiController::resetLoop(int bufferLocation)
 {
     reset = true;
-    stop = false;
-    resetLocation = bufferLocation;
-}
-
-void MidiController::stopLoop(int bufferLocation)
-{
-    stop = true;
-    reset = false;
     resetLocation = bufferLocation;
 }
 
@@ -186,8 +166,8 @@ int MidiController::getLocation(bars barPosition)
 
 void MidiController::flushOldMessages()
 {
-    for(auto&& message : noteOffMessages) bufferMidiMessages.push_back(std::make_pair(message.first, resetLocation));
-    for(auto&& message : sustainedMidiMessages) bufferMidiMessages.push_back(std::make_pair(message, resetLocation));
+    for(auto&& message : noteOffMessages) bufferMidiMessages.push_back(std::make_pair(message.first, 0));
+    for(auto&& message : sustainedMidiMessages) bufferMidiMessages.push_back(std::make_pair(message, 0));
 
     noteOffMessages.clear();
     sustainedMidiMessages.clear();

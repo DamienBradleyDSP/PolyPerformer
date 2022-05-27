@@ -20,27 +20,38 @@ MidiVoice::~MidiVoice()
 {
 }
 
-void MidiVoice::startOfNewBuffer()
+void MidiVoice::endOfBuffer()
 {
     newNoteIncoming = false;
-    currentNote = newNote;
+    //currentNote = newNote;
 }
 
 void MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
 {
-    if (newNoteIncoming && bufferLocation >= newNoteBufferLocation) message.setNoteNumber(newNote.getNoteNumber());
-    else message.setNoteNumber(currentNote.getNoteNumber());
+    message.setNoteNumber(currentNote.getNoteNumber());
 }
 
 void MidiVoice::noteOn(juce::MidiMessage message)
 {
-    newNote = message;
+    currentNote = message;
     newNoteBufferLocation = message.getTimeStamp();
     newNoteIncoming = true;
-    startLoop(message.getTimeStamp());
+    resetLoop(message.getTimeStamp());
+    notePlaying = true;
 }
 
 void MidiVoice::noteOff(juce::MidiMessage message)
 {
-    stopLoop(message.getTimeStamp());
+    resetLoop(message.getTimeStamp());
+    notePlaying = false;
+}
+
+bool MidiVoice::isVoicePlaying()
+{
+    return notePlaying;
+}
+
+bool MidiVoice::generateNotes()
+{
+    return notePlaying;
 }

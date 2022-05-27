@@ -31,11 +31,11 @@ public:
 
     // Beat Interface
     void addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
-    
-    virtual void modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
 
 protected:
-    void startLoop(int bufferLocation);
+    virtual bool generateNotes() = 0;
+    virtual void modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
+    void resetLoop(int bufferLocation);
     void stopLoop(int bufferLocation);
 private:
 
@@ -64,6 +64,5 @@ private:
     bool sustainToNextNote = false;
 
     bool reset = false;
-    bool stop = true;
     int resetLocation=0;
 };

@@ -34,6 +34,8 @@ SequencerModule::~SequencerModule()
 void SequencerModule::initialise(double s, int b)
 {
     for (auto&& voice : midiVoices) voice->initialise(s,b);
+    sampleRate = s;
+    bufferSize = b;
 }
 
 void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
@@ -45,10 +47,18 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
     // calculate current sample range for buffer and get bar location
 
-    for(auto&& voice : midiVoices) voice->startOfNewBuffer();
     for (auto&& voice : playingVoices) voice->calculateBufferSamples(playhead, totalNumberOfBars);
     for (auto&& rModule : rhythmModules) rModule->generateMidi(playingVoices);
     for (auto&& voice : playingVoices) voice->applyMidiMessages(buffer);
+    for (auto&& voice : midiVoices) voice->endOfBuffer();
+
+    auto copyOfMessages{ playingVoices };
+    playingVoices.clear();
+    for (auto&& message : copyOfMessages)
+    {
+        if (message->isVoicePlaying()) playingVoices.push_back(message);
+        else nonPlayingVoices.push(message);
+    }
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
@@ -85,9 +95,6 @@ void SequencerModule::addNoteOff(juce::MidiMessage message)
     else
     {
         midiNoteToSequencerMap[message.getNoteNumber()]->noteOff(message);
-        playingVoices.remove(midiNoteToSequencerMap[message.getNoteNumber()]);
-        nonPlayingVoices.push(midiNoteToSequencerMap[message.getNoteNumber()]);
-        midiNoteToSequencerMap[message.getNoteNumber()] = nullptr;
     }
 }
 

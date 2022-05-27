@@ -70,7 +70,6 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     buffer.clear();
 
     for (auto&& message : incomingMidi) processIncomingMidi(message.first, message.second);
-    //for (auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
     sequencerModules[0]->generateMidi(buffer, playhead);
 }
 
