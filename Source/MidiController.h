@@ -33,7 +33,8 @@ public:
     void addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain = false);
 
 protected:
-    virtual bool modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
+    virtual void modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
+    virtual bool generateNewNotes() = 0;
     void resetLoop(int bufferLocation);
 private:
 

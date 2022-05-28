@@ -19,7 +19,7 @@ namespace ProjectSettings
     //Functional Settings 
 
     //constexpr int midiChannel = 1;
-    constexpr int VoiceLimit = 16;
+    constexpr int VoiceLimit = 2;
 
 
 

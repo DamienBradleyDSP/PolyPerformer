@@ -36,11 +36,12 @@ private:
 
     std::vector<std::unique_ptr<MidiVoice>> midiVoices;
     std::list<MidiVoice*> playingVoices; // holds playing voices in order
-    std::queue<MidiVoice*> stoppingVoices; // holds voices that have note off triggered
     std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
     std::array<MidiVoice*, 128> midiNoteToSequencerMap;
 
     std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
     bars barOffset = 0;
+
+    std::atomic<float>* releaseTime; // user set release time
 };

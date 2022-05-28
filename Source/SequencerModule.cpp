@@ -63,25 +63,25 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
-    if (midiNoteToSequencerMap[message.getNoteNumber()] != nullptr)
+    if (midiNoteToSequencerMap[message.getNoteNumber()] != nullptr) // if note already assigned to voice then retrigger
     {
         auto voice = midiNoteToSequencerMap[message.getNoteNumber()];
-        voice->noteOn(message);
-        playingVoices.remove(voice);
+        voice->turnVoiceOn(message);
+        playingVoices.remove(voice); // use an iterator and erase!
         playingVoices.push_back(voice);
     }
-    else if (nonPlayingVoices.empty())
+    else if (nonPlayingVoices.empty()) // if there are no unused voices - use a playing voice, oldest first
     {
         auto voice = playingVoices.front();
-        voice->noteOn(message);
+        voice->turnVoiceOn(message);
         playingVoices.pop_front();
         playingVoices.push_back(voice);
         midiNoteToSequencerMap[message.getNoteNumber()] = voice;
     }
-    else
+    else // if there is an unused voice available
     {
         auto voice = nonPlayingVoices.front();
-        voice->noteOn(message);
+        voice->turnVoiceOn(message);
         nonPlayingVoices.pop();
         playingVoices.push_back(voice);
         midiNoteToSequencerMap[message.getNoteNumber()] = voice;
@@ -94,7 +94,7 @@ void SequencerModule::addNoteOff(juce::MidiMessage message)
     if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return; // shouldnt be reached
     else
     {
-        midiNoteToSequencerMap[message.getNoteNumber()]->noteOff(message);
+        midiNoteToSequencerMap[message.getNoteNumber()]->turnVoiceOff(message);
     }
 }
 

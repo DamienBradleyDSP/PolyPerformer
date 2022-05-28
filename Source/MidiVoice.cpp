@@ -26,15 +26,18 @@ void MidiVoice::endOfBuffer()
     //currentNote = newNote;
 }
 
-bool MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
+void MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
 {
     message.setNoteNumber(currentNote.getNoteNumber());
-    if (newNoteIncoming && bufferLocation < newNoteBufferLocation) return false;
-    else if (!notePlaying) return false;
-    else return true;
+    message.setVelocity(message.getVelocity() * currentNote.getVelocity());
 }
 
-void MidiVoice::noteOn(juce::MidiMessage message)
+bool MidiVoice::generateNewNotes()
+{
+    return notePlaying;
+}
+
+void MidiVoice::turnVoiceOn(juce::MidiMessage message)
 {
     currentNote = message;
     newNoteBufferLocation = message.getTimeStamp();
@@ -43,10 +46,14 @@ void MidiVoice::noteOn(juce::MidiMessage message)
     notePlaying = true;
 }
 
-void MidiVoice::noteOff(juce::MidiMessage message)
+void MidiVoice::turnVoiceOff(juce::MidiMessage message)
 {
     resetLoop(message.getTimeStamp());
     notePlaying = false;
+}
+
+void MidiVoice::triggerReleaseGraph(float timeInSamples)
+{
 }
 
 bool MidiVoice::isVoicePlaying()

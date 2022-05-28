@@ -20,14 +20,16 @@ public:
     ~MidiVoice();
 
     void endOfBuffer();
-    bool modifyMessage(juce::MidiMessage& message, int bufferLocation) override;
-
-    void noteOn(juce::MidiMessage message);
-    void noteOff(juce::MidiMessage message);
+    void turnVoiceOn(juce::MidiMessage message);
+    void turnVoiceOff(juce::MidiMessage message);
+    void triggerReleaseGraph(float timeInSamples);
     bool isVoicePlaying();
     // HANDLE SUSTAIN OUTSIDE THIS CLASS!
     // CHANGE TO JUST "TURN ON" "TURN OFF" AND FEED IN A TRIGGER TO A VELOCITY DROP TO MIMIC SUSTAIN
 private:
+    void modifyMessage(juce::MidiMessage& message, int bufferLocation) override;
+    bool generateNewNotes() override;
+
     juce::MidiMessage currentNote;
 
     bool newNoteIncoming = false;

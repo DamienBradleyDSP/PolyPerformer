@@ -98,11 +98,13 @@ void MidiController::applyMidiMessages(juce::MidiBuffer& buffer)
 
 void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteOnPosition, juce::MidiMessage& noteOffMessage, bars noteOffPosition, bool sustain)
 {
+    if (generateNewNotes() == false) return;
+
     // Currently checks twice but why
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
 
-    if(modifyMessage(noteOnMessage, noteOnSampleLocation) == false) return;
+    modifyMessage(noteOnMessage, noteOnSampleLocation);
     modifyMessage(noteOffMessage, noteOnSampleLocation);
 
     bufferMidiMessages.push_back(std::make_pair(noteOnMessage, noteOnSampleLocation));
