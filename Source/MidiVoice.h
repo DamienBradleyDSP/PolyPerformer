@@ -20,21 +20,26 @@ public:
     ~MidiVoice();
 
     void endOfBuffer();
-    void turnVoiceOn(juce::MidiMessage message);
-    void turnVoiceOff(juce::MidiMessage message);
-    void triggerReleaseGraph(float timeInSamples);
     bool isVoicePlaying();
+
+    void addNoteOn(juce::MidiMessage message);
+    void addNoteOff(juce::MidiMessage message);
+    void changeSustain(juce::MidiMessage message);
     // HANDLE SUSTAIN OUTSIDE THIS CLASS!
     // CHANGE TO JUST "TURN ON" "TURN OFF" AND FEED IN A TRIGGER TO A VELOCITY DROP TO MIMIC SUSTAIN
 private:
+    void turnVoiceOn(juce::MidiMessage message);
+    void turnVoiceOff(juce::MidiMessage message);
+    void triggerRelease();
     void modifyMessage(juce::MidiMessage& message, int bufferLocation) override;
     bool generateNewNotes() override;
 
-    juce::MidiMessage currentNote;
-
+    juce::MidiMessage note;
     bool newNoteIncoming = false;
     int newNoteBufferLocation=0;
-    juce::MidiMessage newNote;
 
-    bool notePlaying = true;
+    bool isNotePlaying = false;
+    bool isNoteDown = false;
+    bool isSustainPedalDown = false;
+
 };

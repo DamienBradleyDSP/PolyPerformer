@@ -61,19 +61,25 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
     }
 }
 
+void SequencerModule::addMessage(juce::MidiMessage message)
+{
+
+}
+
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
+
     if (midiNoteToSequencerMap[message.getNoteNumber()] != nullptr) // if note already assigned to voice then retrigger
     {
         auto voice = midiNoteToSequencerMap[message.getNoteNumber()];
-        voice->turnVoiceOn(message);
+        voice->addNoteOn(message);
         playingVoices.remove(voice); // use an iterator and erase!
         playingVoices.push_back(voice);
     }
     else if (nonPlayingVoices.empty()) // if there are no unused voices - use a playing voice, oldest first
     {
         auto voice = playingVoices.front();
-        voice->turnVoiceOn(message);
+        voice->addNoteOn(message);
         playingVoices.pop_front();
         playingVoices.push_back(voice);
         midiNoteToSequencerMap[message.getNoteNumber()] = voice;
@@ -81,7 +87,7 @@ void SequencerModule::addNoteOn(juce::MidiMessage message)
     else // if there is an unused voice available
     {
         auto voice = nonPlayingVoices.front();
-        voice->turnVoiceOn(message);
+        voice->addNoteOn(message);
         nonPlayingVoices.pop();
         playingVoices.push_back(voice);
         midiNoteToSequencerMap[message.getNoteNumber()] = voice;
@@ -90,14 +96,15 @@ void SequencerModule::addNoteOn(juce::MidiMessage message)
 
 void SequencerModule::addNoteOff(juce::MidiMessage message)
 {
-    //if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) jassertfalse; // shouldnt be reached
+
     if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return; // shouldnt be reached
     else
     {
-        midiNoteToSequencerMap[message.getNoteNumber()]->turnVoiceOff(message);
+        midiNoteToSequencerMap[message.getNoteNumber()]->addNoteOff(message);
     }
 }
 
 void SequencerModule::changeSustain(juce::MidiMessage message)
 {
+    for (auto&& voice : midiVoices) voice->changeSustain(message);
 }

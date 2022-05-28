@@ -25,11 +25,13 @@ public:
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
 
+    void addMessage(juce::MidiMessage);
+
+
+private:
     void addNoteOn(juce::MidiMessage message);
     void addNoteOff(juce::MidiMessage message);
     void changeSustain(juce::MidiMessage message);
-
-private:
 
     double sampleRate;
     int bufferSize;
@@ -44,4 +46,5 @@ private:
     bars barOffset = 0;
 
     std::atomic<float>* releaseTime; // user set release time
+    
 };

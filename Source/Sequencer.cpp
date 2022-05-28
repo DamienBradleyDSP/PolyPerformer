@@ -82,8 +82,7 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
     // Pass midi voice + buffer to rhythm and beat,  beat will make checks and pass buffer to voice
 
     message.setTimeStamp(sampleLocation);
-    if(message.isNoteOn()) sequencerModules[0]->addNoteOn(message);
-    else if(message.isNoteOff()) sequencerModules[0]->addNoteOff(message);
+    sequencerModules[0]->addMessage(message);
 }
 
 void Sequencer::processRandomNoteOn(juce::MidiMessage message)

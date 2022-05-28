@@ -12,8 +12,7 @@
 
 MidiVoice::MidiVoice(AudioProcessorValueTreeState& parameters)
 {
-    currentNote = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, ProjectSettings::midiNote, (float)ProjectSettings::midiVelocity);
-    newNote = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, ProjectSettings::midiNote, (float)ProjectSettings::midiVelocity);
+    note = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, ProjectSettings::midiNote, (float)ProjectSettings::midiVelocity);
 }
 
 MidiVoice::~MidiVoice()
@@ -26,37 +25,64 @@ void MidiVoice::endOfBuffer()
     //currentNote = newNote;
 }
 
-void MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
+bool MidiVoice::isVoicePlaying()
 {
-    message.setNoteNumber(currentNote.getNoteNumber());
-    message.setVelocity(message.getVelocity() * currentNote.getVelocity());
+    return isNotePlaying;
 }
 
-bool MidiVoice::generateNewNotes()
+void MidiVoice::addNoteOn(juce::MidiMessage message)
 {
-    return notePlaying;
+    isNoteDown = true;
+    turnVoiceOn(message);
+}
+
+void MidiVoice::addNoteOff(juce::MidiMessage message)
+{
+    isNoteDown = false;
+    // if release already triggered, reset and return
+    if (isSustainPedalDown) return;
+    else
+    {
+        // trigger release
+    }
+}
+
+void MidiVoice::changeSustain(juce::MidiMessage message)
+{
+    // if release triggered, return
+    isSustainPedalDown = message.isSustainPedalOn();
+    if (message.isSustainPedalOff() && !isNoteDown)
+    {
+        // trigger release
+    }
 }
 
 void MidiVoice::turnVoiceOn(juce::MidiMessage message)
 {
-    currentNote = message;
+    note = message;
     newNoteBufferLocation = message.getTimeStamp();
     newNoteIncoming = true;
     resetLoop(message.getTimeStamp());
-    notePlaying = true;
+    isNotePlaying = true;
 }
 
 void MidiVoice::turnVoiceOff(juce::MidiMessage message)
 {
     resetLoop(message.getTimeStamp());
-    notePlaying = false;
+    isNotePlaying = false;
 }
 
-void MidiVoice::triggerReleaseGraph(float timeInSamples)
+void MidiVoice::triggerRelease()
 {
 }
 
-bool MidiVoice::isVoicePlaying()
+void MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
 {
-    return notePlaying;
+    message.setNoteNumber(note.getNoteNumber());
+    message.setVelocity(message.getVelocity()*note.getVelocity());
+}
+
+bool MidiVoice::generateNewNotes()
+{
+    return isNotePlaying;
 }
