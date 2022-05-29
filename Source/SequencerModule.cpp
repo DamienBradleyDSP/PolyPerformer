@@ -20,9 +20,11 @@ SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
         rhythmModules.push_back(std::unique_ptr<RhythmModule>(new RhythmModule(parameters,i)));
     }
 
-    for (auto&& entry : midiNoteToSequencerMap)
+    for (auto&& entry : midiNoteToSequencerMap) entry = nullptr;
+
+    for (auto&& voice : midiVoices)
     {
-        entry = nullptr;
+        SequencerToMidiNoteMap.insert(std::make_pair(voice.get(), -1));
     }
 
 }
@@ -52,6 +54,7 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
     for (auto&& voice : playingVoices) voice->applyMidiMessages(buffer);
     for (auto&& voice : midiVoices) voice->endOfBuffer();
 
+    
     auto copyOfMessages{ playingVoices };
     playingVoices.clear();
     for (auto&& message : copyOfMessages)
@@ -63,34 +66,44 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
 void SequencerModule::addMessage(juce::MidiMessage message)
 {
-
+    if (message.isNoteOn()) addNoteOn(message);
+    else if (message.isNoteOff()) addNoteOff(message);
+    else if (message.isSustainPedalOn() || message.isSustainPedalOff()) changeSustain(message);
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
+    auto midiNote = message.getNoteNumber();
 
     if (midiNoteToSequencerMap[message.getNoteNumber()] != nullptr) // if note already assigned to voice then retrigger
     {
-        auto voice = midiNoteToSequencerMap[message.getNoteNumber()];
-        voice->addNoteOn(message);
+        auto voice = midiNoteToSequencerMap[midiNote];
+        voice->addNoteOn(message,sustainPedal);
         playingVoices.remove(voice); // use an iterator and erase!
         playingVoices.push_back(voice);
+
+        midiNoteToSequencerMap[midiNote] = voice;
+        SequencerToMidiNoteMap[voice] = midiNote;
     }
     else if (nonPlayingVoices.empty()) // if there are no unused voices - use a playing voice, oldest first
     {
         auto voice = playingVoices.front();
-        voice->addNoteOn(message);
+        voice->addNoteOn(message,sustainPedal);
         playingVoices.pop_front();
         playingVoices.push_back(voice);
-        midiNoteToSequencerMap[message.getNoteNumber()] = voice;
+
+        midiNoteToSequencerMap[midiNote] = voice;
+        SequencerToMidiNoteMap[voice] = midiNote;
     }
     else // if there is an unused voice available
     {
         auto voice = nonPlayingVoices.front();
-        voice->addNoteOn(message);
+        voice->addNoteOn(message,sustainPedal);
         nonPlayingVoices.pop();
         playingVoices.push_back(voice);
-        midiNoteToSequencerMap[message.getNoteNumber()] = voice;
+
+        midiNoteToSequencerMap[midiNote] = voice;
+        SequencerToMidiNoteMap[voice] = midiNote;
     }
 }
 
@@ -106,5 +119,8 @@ void SequencerModule::addNoteOff(juce::MidiMessage message)
 
 void SequencerModule::changeSustain(juce::MidiMessage message)
 {
+    sustainPedal = message.isSustainPedalOn();
     for (auto&& voice : midiVoices) voice->changeSustain(message);
 }
+
+

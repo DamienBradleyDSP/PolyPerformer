@@ -87,7 +87,7 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
 
 void Sequencer::processRandomNoteOn(juce::MidiMessage message)
 {
-    auto selection = randomSelect(gen);
-    sequencerModules[0]->addNoteOn(message);
-    midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0].get();
+    //auto selection = randomSelect(gen);
+    //sequencerModules[0]->addNoteOn(message);
+    //midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0].get();
 }

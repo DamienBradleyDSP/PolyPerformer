@@ -24,14 +24,13 @@ public:
 
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
-
     void addMessage(juce::MidiMessage);
-
 
 private:
     void addNoteOn(juce::MidiMessage message);
     void addNoteOff(juce::MidiMessage message);
     void changeSustain(juce::MidiMessage message);
+
 
     double sampleRate;
     int bufferSize;
@@ -39,12 +38,16 @@ private:
     std::vector<std::unique_ptr<MidiVoice>> midiVoices;
     std::list<MidiVoice*> playingVoices; // holds playing voices in order
     std::queue<MidiVoice*> nonPlayingVoices; // holds non-playing voices
-    std::array<MidiVoice*, 128> midiNoteToSequencerMap;
+
+    std::array<MidiVoice*, 128> midiNoteToSequencerMap; // Input MidiNote, return current voice playing it
+    std::map<MidiVoice*, int> SequencerToMidiNoteMap; // Input sequencer, return current midi note being played
 
     std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
     bars barOffset = 0;
 
     std::atomic<float>* releaseTime; // user set release time
+
+    bool sustainPedal = false;
     
 };
