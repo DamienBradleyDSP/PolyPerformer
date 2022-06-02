@@ -10,7 +10,7 @@
 #include "rhythmLoader.h"
 
 //==============================================================================
-rhythmLoader::rhythmLoader(AudioProcessorValueTreeState& parameters)
+rhythmLoader::rhythmLoader(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p)
 	: unusedmember(0), Button(String(0))
 // >>>>INITIALISATION>>>> (auto-generated)//
 // <<<<INITIALISATION<<<< (will be overwritten!!)   
@@ -25,41 +25,7 @@ rhythmLoader::rhythmLoader(AudioProcessorValueTreeState& parameters)
 	// <<<<CONSTRUCTOR<<<< (will be overwritten!!)   
 	fileName1.setInterceptsMouseClicks(false, false);
 
-	onClick = [this]()
-	{
-		File rootFolder = File::getSpecialLocation(File::SpecialLocationType::userApplicationDataDirectory);
-		rootFolder = rootFolder.getChildFile("SuperConductor").getChildFile("PolyPerformer");
-		Result res = rootFolder.createDirectory();
-
-		FileChooser myChooser("load from file",
-			rootFolder,
-			"*.polym,*.polyk");
-
-		if (myChooser.browseForFileToOpen())
-		{
-			File presetToLoad = myChooser.getResult();
-
-			if (presetToLoad.existsAsFile())
-			{
-				XmlDocument loaded(presetToLoad);
-				if (auto mainElement = loaded.getDocumentElement())
-				{
-					auto state = juce::ValueTree::fromXml(*mainElement);
-
-					//parameters->replaceState(state);
-					//parameters->getRawParameterValue("loadSaveState")->store(true);
-					//parameters->getParameter("loadSaveState")->setValueNotifyingHost(true);
-					//getActiveEditor()->repaint();
-					fileName1.setText(String(presetToLoad.getFileNameWithoutExtension()), dontSendNotification);
-					repaint();
-				}
-				else
-				{
-					String error = loaded.getLastParseError();
-				}
-			}
-		}
-	};
+	addListener(&p); // Change on click to processor
 }
 
 rhythmLoader::~rhythmLoader()

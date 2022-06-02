@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class PolyPerformerAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
+class PolyPerformerAudioProcessor  : public juce::AudioProcessor, public Button::Listener
 {
 public:
     //==============================================================================
@@ -54,11 +54,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void parameterChanged(const juce::String& parameterID, float newValue) override;
+    void buttonClicked(juce::Button*) override;
+    juce::String getPresetName();
 
 private:
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::ValueTree translatePolyManFile(juce::ValueTree,int moduleNumber);
+    juce::ValueTree translatePolykolFile(juce::ValueTree, int moduleNumber);
+
     juce::UndoManager undoManager;
     juce::AudioProcessorValueTreeState parameters;
 
@@ -66,7 +70,7 @@ private:
     juce::AudioPlayHead::CurrentPositionInfo currentpositionstruct;
 
     juce::ValueTree newPreset;
-    juce::String currentPresetName;
+    std::array<juce::String, ProjectSettings::numberOfModules> moduleFileNames;
 
     int frameCounter = 0; // TESTING
     double srate;

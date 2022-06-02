@@ -20,7 +20,7 @@ class rhythmLoader : public Button
 {
 public:
 	rhythmLoader() =delete;
-	rhythmLoader(AudioProcessorValueTreeState& parameters);
+	rhythmLoader(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p);
     ~rhythmLoader();
 
 	void paintButton(Graphics&, bool isMouseOverButton, bool isButtonDown) override;

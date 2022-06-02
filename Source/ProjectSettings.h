@@ -18,15 +18,16 @@ namespace ProjectSettings
 {
     //Functional Settings 
 
-    //constexpr int midiChannel = 1;
+    constexpr int midiChannel = 1;
     constexpr int VoiceLimit = 16;
+	constexpr int numberOfModules = 4;
+	constexpr int midiNote = 36;
 
 
 
 
 
-
-
+	//POLYKOL IMPORTED
 	constexpr int startingNumberOfBeats = 4;
 	constexpr int startingNumberOfBars = 1;
 	constexpr int startingSemitone = 0;
@@ -38,9 +39,12 @@ namespace ProjectSettings
 	constexpr int maxNumberOfBeats = 32;
 	constexpr int minNumberOfBars = 1;
 	constexpr int maxNumberOfBars = 8;
-
-
-	constexpr int midiChannel = 1;
-	constexpr int midiNote = 36;
+	//constexpr int midiChannel = 1;
+	//constexpr int midiNote = 36;
 	constexpr float midiVelocity = 0.5;
+
+	// POLYMAN ADDITIONAL
+
+	constexpr int minNumberOfBarsToRepeatOver = 1;
+	constexpr int maxNumberOfBarsToRepeatOver = 32;
 };

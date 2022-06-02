@@ -24,7 +24,7 @@ class polyModule : public Component, Button::Listener
 {
 public:
 	polyModule() =delete;
-	polyModule(AudioProcessorValueTreeState& parameters);
+	polyModule(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p, int moduleNumber);
     ~polyModule();
 
     void paint (Graphics&) override;
@@ -35,6 +35,8 @@ private:
 	int unusedmember;
 
 	void buttonClicked(Button*) override;
+
+	const int moduleNumber;
 
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	juce::Slider sustainSliderSlider1;

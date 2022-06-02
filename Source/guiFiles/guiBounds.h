@@ -22,11 +22,13 @@ class guiBounds : public Component
 {
 public:
 	guiBounds() =delete;
-	guiBounds(AudioProcessorValueTreeState& parameters);
+	guiBounds(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p);
     ~guiBounds();
 
     void paint (Graphics&) override;
     void resized() override;
+
+	void updateGui(juce::String presetName);
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(guiBounds)

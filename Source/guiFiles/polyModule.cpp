@@ -10,12 +10,15 @@
 #include "polyModule.h"
 
 //==============================================================================
-polyModule::polyModule(AudioProcessorValueTreeState& parameters)
-	: unusedmember(0), noteSelectorKeyboard(noteSelectorKeyState,MidiKeyboardComponent::Orientation::horizontalKeyboard)
+polyModule::polyModule(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p, int m)
+	: unusedmember(0), 
+	noteSelectorKeyboard(noteSelectorKeyState,MidiKeyboardComponent::Orientation::horizontalKeyboard),
+	moduleNumber(m)
+
 // >>>>INITIALISATION>>>> (auto-generated)//
 , noteSelector1(parameters)
 , OnOffButton1(parameters)
-, rhythmLoader1(parameters)
+, rhythmLoader1(parameters,p)
 // <<<<INITIALISATION<<<< (will be overwritten!!)   
 {
 	// >>>>CONSTRUCTOR>>>> (auto-generated)//
@@ -36,6 +39,8 @@ polyModule::polyModule(AudioProcessorValueTreeState& parameters)
 	noteSelectorKeyboard.setColour(MidiKeyboardComponent::ColourIds::mouseOverKeyOverlayColourId, Colour::fromRGB(218, 132, 151).brighter(0.4));
 	noteSelectorKeyboard.setColour(MidiKeyboardComponent::ColourIds::keyDownOverlayColourId, Colour::fromRGB(218, 132, 151));
 	noteSelectorKeyboard.setColour(MidiKeyboardComponent::ColourIds::upDownButtonArrowColourId, Colour::fromRGB(218, 132, 151));
+
+	rhythmLoader1.setName(juce::String(moduleNumber));
 }
 
 polyModule::~polyModule()

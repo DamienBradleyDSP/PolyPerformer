@@ -10,7 +10,7 @@
 #include "guiBounds.h"
 
 //==============================================================================
-guiBounds::guiBounds(AudioProcessorValueTreeState& parameters)
+guiBounds::guiBounds(AudioProcessorValueTreeState& parameters, juce::Button::Listener& p)
 	: unusedmember(0)
 // >>>>INITIALISATION>>>> (auto-generated)//
 , polyModuleArea(23,90,359,213)
@@ -35,10 +35,10 @@ guiBounds::guiBounds(AudioProcessorValueTreeState& parameters)
 		//if(modeSelectorSlider1.getValue())
 	};
 
-	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
-	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
-	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
-	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,0)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,1)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,2)));
+	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,3)));
 	for (auto&& modu : polyModules) addAndMakeVisible(*modu);
 }
 
@@ -1141,6 +1141,10 @@ void guiBounds::resized()
 		polyModuleArea.removeFromTop(polyModulepixelGap);
 	}
 
+}
+
+void guiBounds::updateGui(juce::String presetName)
+{
 }
 
 // >>>>FUNCTION>>>> (auto-generated)//
