@@ -25,9 +25,10 @@ namespace ProjectSettings
 
 
 
+	// POLYKOL PARAM ANALYSIS DEFAULTS
+	constexpr int polykolMaximumRhythmModules = 32;
 
-
-	//POLYKOL IMPORTED
+	//POLYKOL IMPORTED SETTINGS
 	constexpr int startingNumberOfBeats = 4;
 	constexpr int startingNumberOfBars = 1;
 	constexpr int startingSemitone = 0;

@@ -331,7 +331,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor:
     for (int m = 0; m < ProjectSettings::numberOfModules; m++)
     {
         layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
-            /*ParamID*/ "concurrentORsequentialRead",
+            /*ParamID*/ "Module" + juce::String(m) + "concurrentORsequentialRead",
             /*paramName*/ "concurrentORsequentialRead",
             /*LabelText*/ "concurrentORsequentialRead",
             /*Min,max, optional:precision*/ juce::NormalisableRange<float>(ProjectSettings::minNumberOfRhythmModules, ProjectSettings::maxNumberOfRhythmModules, 1),
@@ -654,6 +654,61 @@ juce::ValueTree PolyPerformerAudioProcessor::translatePolykolFile(juce::ValueTre
 {
     auto paramState = parameters.copyState();
 
+    // Put module read order result into a list
+    // this should now be the module order
+    // then go through each module in that list, if its on, add to new list
+    // now you have correct modules in order, verify with number of modules
+
+    std::list<int> moduleOrder;
+    for (int i = 0; i < ProjectSettings::polykolMaximumRhythmModules; i++)
+    {
+        moduleOrder.push_back((int)loadedFileTree.getPropertyAsValue("moduleReadOrder" + String(i), nullptr, false).getValue());
+    }
+    std::list<int> activeModules;
+    for (auto&& entry : moduleOrder)
+    {
+        if ((bool)loadedFileTree.getPropertyAsValue("moduleTurnedOn" + String(entry), nullptr, false).getValue()) activeModules.push_back(entry);
+    }
+    // Verifying size
+    if (activeModules.size() != (bool)loadedFileTree.getPropertyAsValue("numberOfModules", nullptr, false).getValue()) jassertfalse; // if this triggered then somethings gone wrong with loading or saving preset
+
+    // For entry in active modules
+    // Enter into this plugins specific rhythm module each property in order
+
+    auto moduleString = "Module" + juce::String(moduleNumber);
+    auto rhythmNumber = 0;
+    for (auto&& entry : activeModules)
+    {
+        paramState.setProperty(moduleString + "concurrentORsequentialRead", 1, nullptr);
+        paramState.setProperty(moduleString + "barOffset", loadedFileTree.getPropertyAsValue("barOffset",nullptr,false).getValue(), nullptr);
+        paramState.setProperty(moduleString + "numberOfBeats"+juce::String(rhythmNumber), loadedFileTree.getPropertyAsValue("numberOfBeats" + juce::String(entry),nullptr,false).getValue(), nullptr);
+        paramState.setProperty(moduleString + "numberOfBars"+juce::String(rhythmNumber), loadedFileTree.getPropertyAsValue("numberOfBars" + juce::String(entry),nullptr,false).getValue(), nullptr);
+        paramState.setProperty(moduleString + "selectionOfBeats"+juce::String(rhythmNumber), loadedFileTree.getPropertyAsValue("selectionOfBeats" + juce::String(entry),nullptr,false).getValue(), nullptr);
+        paramState.setProperty(moduleString + "moduleTurnedOn"+juce::String(rhythmNumber), loadedFileTree.getPropertyAsValue("moduleTurnedOn" + juce::String(entry),nullptr,false).getValue(), nullptr);
+
+        for (int beatNumber = 1; beatNumber <= ProjectSettings::maxNumberOfBeats; beatNumber++)
+        {
+            auto beatString = "B" + juce::String(beatNumber);
+            paramState.setProperty(moduleString + "BeatOnOffR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("BeatOnOffR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            paramState.setProperty(moduleString + "VelocityR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("VelocityR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            paramState.setProperty(moduleString + "noteLengthR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("noteLengthR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            paramState.setProperty(moduleString + "SemitoneR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("SemitoneR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            paramState.setProperty(moduleString + "OctaveR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("OctaveR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            paramState.setProperty(moduleString + "SustainR" + juce::String(rhythmNumber)+beatString, loadedFileTree.getPropertyAsValue("SustainR" + juce::String(entry) + beatString, nullptr, false).getValue(), nullptr);
+            
+
+            paramState.setProperty(moduleString + "barsToRepeatOver" + juce::String(rhythmNumber)+beatString, 1, nullptr);
+            for (int barNum = 1; barNum <= ProjectSettings::maxNumberOfBarsToRepeatOver; barNum++)
+            {
+                paramState.setProperty(moduleString + "barOnOffR" + juce::String(rhythmNumber) + beatString, 1, nullptr);
+                paramState.setProperty(moduleString + "barVelocityR" + juce::String(rhythmNumber) + beatString, 1, nullptr);
+            }
+        }
+
+        rhythmNumber++;
+    }
+
+
     // Identical
     /*
     loadSaveState // ignore
@@ -679,9 +734,9 @@ juce::ValueTree PolyPerformerAudioProcessor::translatePolykolFile(juce::ValueTre
     SustainR = 
     
     NEW
-    PER MODULE PER RHYTHM
-    barsToRepeatOver = 1
     PER MODULE PER RHYTHM PER BEAT
+    barsToRepeatOver = 1
+    PER MODULE PER RHYTHM PER BEAT PER BAR
     barOnOffR = 1
     barVelocityR = 1
     */
