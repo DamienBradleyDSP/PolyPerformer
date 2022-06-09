@@ -25,6 +25,8 @@ public:
 
 	void paintButton(Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
+	void setModuleName(juce::String presetName);
+
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(rhythmLoader)
 	int unusedmember;

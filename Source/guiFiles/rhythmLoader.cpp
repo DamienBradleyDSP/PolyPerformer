@@ -52,5 +52,10 @@ void rhythmLoader::paintButton(Graphics& g, bool isMouseOverButton, bool isButto
 	// <<<<RESIZED<<<< (will be overwritten!!)
 }
 
+void rhythmLoader::setModuleName(juce::String presetName)
+{
+	fileName1.setText(presetName,dontSendNotification);
+}
+
 // >>>>FUNCTION>>>> (auto-generated)//
 // <<<<FUNCTION<<<< (will be overwritten!!)

@@ -19,6 +19,7 @@ PolyPerformerAudioProcessorEditor::PolyPerformerAudioProcessorEditor (PolyPerfor
     addAndMakeVisible(gui);
 
     loadSaveState = parameters.getRawParameterValue("loadSaveState");
+    gui.updateGui(audioProcessor.getPresetNames());
 }
 
 PolyPerformerAudioProcessorEditor::~PolyPerformerAudioProcessorEditor()
@@ -31,7 +32,8 @@ void PolyPerformerAudioProcessorEditor::paint (juce::Graphics& g)
     if (loadSaveState->load())
     {
         loadSaveState->store(false); // hacky solution to ongoing APVTS problems
-        gui.updateGui(audioProcessor.getPresetName());
+        gui.updateGui(audioProcessor.getPresetNames());
+        repaint();
     }
 }
 

@@ -46,6 +46,7 @@ namespace ProjectSettings
 
 	// POLYMAN ADDITIONAL
 
+	constexpr int maxNumberPolymanRhythms = 5;
 	constexpr int minNumberOfBarsToRepeatOver = 1;
 	constexpr int maxNumberOfBarsToRepeatOver = 32;
 };

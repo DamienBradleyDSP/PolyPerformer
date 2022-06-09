@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <unordered_map>
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
 #include "MidiController.h"
@@ -25,6 +26,8 @@ public:
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
     void addMessage(juce::MidiMessage);
+
+    void replaceModuleState(std::unordered_map<juce::String, float>& moduleState);
 
 private:
     void addNoteOn(juce::MidiMessage message);

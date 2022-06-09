@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <unordered_map>
 #include "Sequencer.h"
 
 //==============================================================================
@@ -55,13 +56,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void buttonClicked(juce::Button*) override;
-    juce::String getPresetName();
+    std::vector<juce::String> getPresetNames();
 
 private:
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::ValueTree translatePolyManFile(juce::ValueTree,int moduleNumber);
-    juce::ValueTree translatePolykolFile(juce::ValueTree, int moduleNumber);
+
+    void setNameTree(juce::ValueTree& tree);
+    void loadModuleState(juce::ValueTree& tree, int moduleNumber);
+    void analyseParameterTree(juce::ValueTree& tree, std::unordered_map<juce::String, float>& parameterList);
 
     juce::UndoManager undoManager;
     juce::AudioProcessorValueTreeState parameters;

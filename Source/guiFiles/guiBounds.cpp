@@ -1143,8 +1143,12 @@ void guiBounds::resized()
 
 }
 
-void guiBounds::updateGui(juce::String presetName)
+void guiBounds::updateGui(std::vector<juce::String> presetNames)
 {
+	polyModules[0]->setModuleName(presetNames[0]);
+	polyModules[1]->setModuleName(presetNames[1]);
+	polyModules[2]->setModuleName(presetNames[2]);
+	polyModules[3]->setModuleName(presetNames[3]);
 }
 
 // >>>>FUNCTION>>>> (auto-generated)//

@@ -10,6 +10,7 @@
 
 #pragma once
 #include <random>
+#include <unordered_map>
 #include "JuceHeader.h"
 #include "SequencerModule.h"
 #include "ProjectSettings.h"
@@ -23,6 +24,8 @@ public:
 
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
+
+    void replaceModuleState(std::unordered_map<juce::String, float>& moduleState, int moduleNumber);
 
 private:
     void processIncomingMidi(juce::MidiMessage message, int sampleLocation);

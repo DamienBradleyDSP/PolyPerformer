@@ -73,6 +73,11 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     sequencerModules[0]->generateMidi(buffer, playhead);
 }
 
+void Sequencer::replaceModuleState(std::unordered_map<juce::String, float>& moduleState, int moduleNumber)
+{
+    sequencerModules[moduleNumber]->replaceModuleState(moduleState);
+}
+
 void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocation)
 {
     // Each sequencer needs multiple voices!!

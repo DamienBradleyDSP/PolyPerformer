@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <unordered_map>
 #include "JuceHeader.h"
 #include "ProjectSettings.h"
 #include "MidiVoice.h"
@@ -27,6 +28,8 @@ public:
     void generateMidi(std::list<MidiVoice*>& voices);
     void getNumberOfBars(bars& runningBarTotal);
 
+    void replaceModuleState(std::unordered_map<juce::String, float>& newState);
+
     const int rhythmNumber;
 
 private:
@@ -38,8 +41,8 @@ private:
     bars lastModuleBarEnding = 0;
 
     // GUI Params
-    std::atomic<float>* moduleOnState;
-    std::atomic<float>* numberOfBeats;
-    std::atomic<float>* numberOfBars;
-    std::atomic<float>* selectedBeats;
+    std::atomic<float> moduleOnState;
+    std::atomic<float> numberOfBeats;
+    std::atomic<float> numberOfBars;
+    std::atomic<float> selectedBeats;
 };

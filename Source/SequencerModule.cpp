@@ -71,6 +71,11 @@ void SequencerModule::addMessage(juce::MidiMessage message)
     else if (message.isSustainPedalOn() || message.isSustainPedalOff()) changeSustain(message);
 }
 
+void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>& moduleState)
+{
+    for (auto&& rhythm : rhythmModules) rhythm->replaceModuleState(moduleState);
+}
+
 void SequencerModule::addNoteOn(juce::MidiMessage message)
 {
     auto midiNote = message.getNoteNumber();

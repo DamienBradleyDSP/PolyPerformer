@@ -66,6 +66,11 @@ void polyModule::resized()
 	noteSelectorKeyboard.setBounds(rhythmLoader1.getBounds());
 }
 
+void polyModule::setModuleName(juce::String presetName)
+{
+	rhythmLoader1.setModuleName(presetName);
+}
+
 void polyModule::buttonClicked(Button*)
 {
 	noteSelectorKeyboard.setVisible(!noteSelectorKeyboard.isVisible());
