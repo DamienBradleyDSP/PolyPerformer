@@ -20,7 +20,7 @@ class SequencerModule
 {
 public:
     SequencerModule() = delete;
-    SequencerModule(juce::AudioProcessorValueTreeState& parameters);
+    SequencerModule(juce::AudioProcessorValueTreeState& parameters, int moduleNumber);
     ~SequencerModule();
 
     void initialise(double sampleRate, int bufferSize);
@@ -33,7 +33,8 @@ private:
     void addNoteOn(juce::MidiMessage message);
     void addNoteOff(juce::MidiMessage message);
     void changeSustain(juce::MidiMessage message);
-
+    
+    const int moduleNumber;
 
     double sampleRate;
     int bufferSize;

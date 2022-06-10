@@ -14,17 +14,19 @@ Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
     gen(rd()),
     randomSelect({ 0, 1, 2, 3})
 {
-    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
-    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
-    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
-    sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters)));
-
+    for (int moduleNumber = 0; moduleNumber <= ProjectSettings::numberOfModules; moduleNumber++)
+    {
+        sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters, moduleNumber)));
+        moduleOnOff.push_back(parameters.getRawParameterValue("moduleOnOff" + juce::String(moduleNumber)));
+        moduleNoteNumber.push_back(parameters.getRawParameterValue("moduleNoteNumber" + juce::String(moduleNumber)));
+    }
 
     modeSelect = parameters.getRawParameterValue("modeSelect");
     for (auto&& entry : midiNoteToSequencerMap)
     {
         entry = sequencerModules[0].get();
     }
+    
 }
 
 Sequencer::~Sequencer()

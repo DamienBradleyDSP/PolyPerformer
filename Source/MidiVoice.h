@@ -19,7 +19,7 @@ public:
     MidiVoice(AudioProcessorValueTreeState& parameters);
     ~MidiVoice();
 
-    void endOfBuffer();
+    void startOfBuffer();
 
     bool isVoicePlaying();
     void addNoteOn(juce::MidiMessage message, bool sustainPedal);
@@ -47,5 +47,7 @@ private:
     bool isNoteDown = false;
     bool isSustainPedalDown = false;
     bool releaseTriggered = false;
+
+    float releaseVelocity = 0.0f;
 
 };

@@ -10,7 +10,8 @@
 
 #include "SequencerModule.h"
 
-SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
+SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters, int m)
+    : moduleNumber(m)
 {
     for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiVoice>(new MidiVoice(parameters)));
     for (auto&& voice : midiVoices) nonPlayingVoices.push(voice.get());
@@ -30,6 +31,7 @@ SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
     barOffset.store(0);
     sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
 
+    releaseTime = parameters.getRawParameterValue("moduleRelease" + juce::String(moduleNumber));
 }
 
 SequencerModule::~SequencerModule()
@@ -52,10 +54,11 @@ void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead
 
     // calculate current sample range for buffer and get bar location
 
+    for (auto&& voice : midiVoices) voice->startOfBuffer();
     for (auto&& voice : playingVoices) voice->calculateBufferSamples(playhead, totalNumberOfBars);
     for (auto&& rModule : rhythmModules) rModule->generateMidi(playingVoices);
     for (auto&& voice : playingVoices) voice->applyMidiMessages(buffer);
-    for (auto&& voice : midiVoices) voice->endOfBuffer();
+    
 
     
     auto copyOfMessages{ playingVoices };

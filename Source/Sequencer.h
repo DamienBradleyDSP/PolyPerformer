@@ -41,4 +41,6 @@ private:
     std::discrete_distribution<> randomSelect;
 
     std::atomic<float>* modeSelect;
+    std::vector<std::atomic<float>*> moduleOnOff;
+    std::vector<std::atomic<float>*> moduleNoteNumber;
 };

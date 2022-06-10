@@ -45,14 +45,13 @@ void MidiVoice::changeSustain(juce::MidiMessage message)
     isSustainPedalDown = message.isSustainPedalOn();
     if (message.isSustainPedalOff() && !isNoteDown)
     {
-        // trigger release
+        triggerRelease();
     }
 }
 void MidiVoice::triggerRelease()
 {
     releaseTriggered = true;
-    note.setTimeStamp(0);
-    turnVoiceOff(note);
+    releaseVelocity = 0.0f;
 }
 void MidiVoice::turnVoiceOn(juce::MidiMessage message)
 {
@@ -72,7 +71,7 @@ void MidiVoice::turnVoiceOff(juce::MidiMessage message)
 void MidiVoice::modifyMessage(juce::MidiMessage& message, int bufferLocation)
 {
     message.setNoteNumber(note.getNoteNumber());
-    message.setVelocity(message.getVelocity()*note.getVelocity());
+    message.setVelocity(message.getFloatVelocity()*note.getFloatVelocity() - releaseVelocity);
 }
 
 bool MidiVoice::generateNewNotes()
@@ -80,8 +79,14 @@ bool MidiVoice::generateNewNotes()
     return isNotePlaying;
 }
 
-void MidiVoice::endOfBuffer()
+void MidiVoice::startOfBuffer()
 {
     newNoteIncoming = false;
+    if (releaseTriggered) releaseVelocity += 0.001f;
+    if (releaseVelocity >= 1.0f)
+    {
+        releaseTriggered = false;
+        turnVoiceOff(note);
+    }
     // Check if release is at end, turn voice off for next buffer?
 }

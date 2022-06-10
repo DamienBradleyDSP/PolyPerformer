@@ -266,7 +266,6 @@ void PolyPerformerAudioProcessor::buttonClicked(juce::Button* b)
     {
         newModuleState = juce::ValueTree::fromXml(*mainElement);
         fileName = myChooser.getResult().getFileNameWithoutExtension();
-        if (fileName.containsNonWhitespaceChars()) return;
         fileExtension = myChooser.getResult().getFileExtension();
     }
     else
@@ -343,9 +342,54 @@ juce::AudioProcessorValueTreeState::ParameterLayout PolyPerformerAudioProcessor:
         /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
         /*Boolean*/ false));
 
-    // Module on/off
-    // module release
-    // Module note number
+    
+    for (int i = 0; i <= ProjectSettings::numberOfModules; i++)
+    {
+        // Module on/off
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            /*ParamID*/ "moduleOnOff"+juce::String(i),
+            /*paramName*/ "moduleOnOff" + juce::String(i),
+            /*LabelText*/ "moduleOnOff" + juce::String(i),
+            /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 1, 0),
+            /*Default/Initial value*/ 0,
+            /*value to text func*/ nullptr,
+            /*text to value func*/ nullptr,
+            /*isMetaParameter*/ false,
+            /*Automatable*/ false,
+            /*Discrete*/ true,
+            /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+            /*Boolean*/ true));
+
+        // Module note number
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            /*ParamID*/ "moduleNoteNumber" + juce::String(i),
+            /*paramName*/ "moduleNoteNumber" + juce::String(i),
+            /*LabelText*/ "moduleNoteNumber" + juce::String(i),
+            /*Min,max, optional:precision*/ juce::NormalisableRange<float>(1, 127, 1),
+            /*Default/Initial value*/ i+1,
+            /*value to text func*/ nullptr,
+            /*text to value func*/ nullptr,
+            /*isMetaParameter*/ false,
+            /*Automatable*/ false,
+            /*Discrete*/ true,
+            /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+            /*Boolean*/ false));
+
+        // module release
+        layout.add(std::make_unique<juce::AudioProcessorValueTreeState::Parameter>(
+            /*ParamID*/ "moduleRelease" + juce::String(i),
+            /*paramName*/ "moduleRelease" + juce::String(i),
+            /*LabelText*/ "moduleRelease" + juce::String(i),
+            /*Min,max, optional:precision*/ juce::NormalisableRange<float>(0, 10, 0.01),
+            /*Default/Initial value*/ 0,
+            /*value to text func*/ nullptr,
+            /*text to value func*/ nullptr,
+            /*isMetaParameter*/ false,
+            /*Automatable*/ false,
+            /*Discrete*/ false,
+            /*category*/ juce::AudioProcessorParameter::Category::genericParameter,
+            /*Boolean*/ false));
+    }
 
     return layout;
 }
