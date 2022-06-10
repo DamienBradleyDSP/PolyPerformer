@@ -45,4 +45,5 @@ private:
     std::atomic<float> numberOfBeats;
     std::atomic<float> numberOfBars;
     std::atomic<float> selectedBeats;
+    std::atomic<float> sequentialOrConcurrentRead;
 };

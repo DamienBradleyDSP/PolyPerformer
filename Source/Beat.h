@@ -41,7 +41,7 @@ private:
     std::atomic<float> onState;
     std::atomic<float> velocity;
     std::atomic<float> noteLength;
-    std::atomic<float> midiNote;
+    int midiNote = ProjectSettings::midiNote;
     std::atomic<float> midiSemitone;
     std::atomic<float> midiOctave;
     std::atomic<float> sustain;

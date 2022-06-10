@@ -27,6 +27,9 @@ SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters)
         SequencerToMidiNoteMap.insert(std::make_pair(voice.get(), -1));
     }
 
+    barOffset.store(0);
+    sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
+
 }
 
 SequencerModule::~SequencerModule()
@@ -71,9 +74,21 @@ void SequencerModule::addMessage(juce::MidiMessage message)
     else if (message.isSustainPedalOn() || message.isSustainPedalOff()) changeSustain(message);
 }
 
-void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>& moduleState)
+void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>& newState)
 {
-    for (auto&& rhythm : rhythmModules) rhythm->replaceModuleState(moduleState);
+    for (auto&& rhythm : rhythmModules) rhythm->replaceModuleState(newState);
+
+    if (newState["fileType"] == ProjectSettings::SequencerFileType::polykol)
+    {
+        barOffset.store(newState["barOffset"]);
+        sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
+    }
+    else if (newState["fileType"] == ProjectSettings::SequencerFileType::polyman)
+    {
+        sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polyman);
+        barOffset.store(1);
+    }
+    else jassertfalse;
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)

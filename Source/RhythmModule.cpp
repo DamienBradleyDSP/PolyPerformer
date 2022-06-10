@@ -18,6 +18,7 @@ RhythmModule::RhythmModule(juce::AudioProcessorValueTreeState& parameters, int r
         beats.push_back(std::unique_ptr<Beat>(new Beat(parameters, rhythmNumber, beatNumber)));
     }
     moduleOnState.store(0);
+    sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
 }
 
 RhythmModule::~RhythmModule()
@@ -43,7 +44,7 @@ void RhythmModule::getNumberOfBars(bars& runningBarTotal)
 {
     // Adds the total number of bars that this module spans over to the total
 
-    if (!moduleOnState.load()) return;
+    if (!moduleOnState.load() || sequentialOrConcurrentRead.load()==ProjectSettings::SequencerFileType::polyman) return;
     lastModuleBarEnding = runningBarTotal;
     runningBarTotal += calculateBarSpan();
 }
@@ -52,10 +53,25 @@ void RhythmModule::replaceModuleState(std::unordered_map<juce::String, float>& n
 {
     for (auto&& beat : beats) beat->replaceModuleState(newState);
 
-    moduleOnState.store(newState["moduleTurnedOn" + juce::String(rhythmNumber)]);
-    numberOfBeats.store(newState["numberOfBeats" + juce::String(rhythmNumber)]);
-    numberOfBars.store(newState["numberOfBars" + juce::String(rhythmNumber)]);
-    selectedBeats.store(newState["selectionOfBeats" + juce::String(rhythmNumber)]);
+    if (newState["fileType"] == ProjectSettings::SequencerFileType::polykol)
+    {
+        moduleOnState.store(newState["moduleTurnedOn" + juce::String(rhythmNumber)]);
+        numberOfBeats.store(newState["numberOfBeats" + juce::String(rhythmNumber)]);
+        numberOfBars.store(newState["numberOfBars" + juce::String(rhythmNumber)]);
+        selectedBeats.store(newState["selectionOfBeats" + juce::String(rhythmNumber)]);
+        sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
+    }
+    else if (newState["fileType"] == ProjectSettings::SequencerFileType::polyman)
+    {
+        if (rhythmNumber >= 5) return;
+        moduleOnState.store(newState["RhythmOnOff" + juce::String(rhythmNumber)]);
+        numberOfBeats.store(newState["selectedNumberOfBeats" + juce::String(rhythmNumber)]);
+        numberOfBars.store(1.0);
+        selectedBeats.store(newState["selectedNumberOfBeats" + juce::String(rhythmNumber)]); // same as selected number for polyman
+        sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polyman);
+        lastModuleBarEnding = 0;
+    }
+    else jassertfalse;
 }
 
 bars RhythmModule::calculateBarSpan()

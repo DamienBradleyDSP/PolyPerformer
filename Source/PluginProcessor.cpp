@@ -266,12 +266,20 @@ void PolyPerformerAudioProcessor::buttonClicked(juce::Button* b)
     {
         newModuleState = juce::ValueTree::fromXml(*mainElement);
         fileName = myChooser.getResult().getFileNameWithoutExtension();
+        if (fileName.containsNonWhitespaceChars()) return;
         fileExtension = myChooser.getResult().getFileExtension();
     }
     else
     {
         String error = loaded.getLastParseError();
     }
+
+    auto fileType = juce::ValueTree("fileType");
+    if (fileExtension == juce::String(".polyk")) fileType.setProperty(juce::String("fileType"), juce::var(ProjectSettings::SequencerFileType::polykol),nullptr);
+    else if (fileExtension == juce::String(".polym"))fileType.setProperty(juce::String("fileType"), juce::var(ProjectSettings::SequencerFileType::polyman), nullptr);
+    else if (fileExtension == juce::String(".midi")) fileType.setProperty(juce::String("fileType"), juce::var(ProjectSettings::SequencerFileType::midi), nullptr);
+    else jassertfalse;
+    newModuleState.appendChild(fileType, nullptr);
 
     std::unordered_map<juce::String, float> newParameters;
     analyseParameterTree(newModuleState, newParameters);
@@ -361,20 +369,27 @@ void PolyPerformerAudioProcessor::loadModuleState(juce::ValueTree& tree, int mod
 }
 void PolyPerformerAudioProcessor::analyseParameterTree(juce::ValueTree& tree, std::unordered_map<juce::String, float>& parameterList)
 {
+    // HERE NEEDS TO DISTINGUISH BETWEEN POLYKOL AND POLYMAN, AND CHANGE/ADD PARAMS ACCORDINGLY
+
     std::list<juce::ValueTree> children;
     auto childTree = tree.getChild(1);
     auto noOfChildren = tree.getNumChildren();
+    ProjectSettings::SequencerFileType fileType;
+
     for (int i = 0; i <= noOfChildren; i++)
     {
         auto child = tree.getChild(i);
         if (child.isValid() && child.getPropertyName(0).toString() == juce::String("id")) children.push_back(child);
+        else if (child.getPropertyName(0).toString() == juce::String("fileType")) fileType = (ProjectSettings::SequencerFileType)(int)child.getProperty(juce::String("fileType"));
     }
+
     for (auto&& child : children)
     {
         auto parameterName = child.getProperty(child.getPropertyName(0)).toString();
         auto parameterValue = (float)child.getProperty(child.getPropertyName(1));
         parameterList.insert(std::make_pair(parameterName, parameterValue));
     }
+    parameterList.insert(std::make_pair("fileType", fileType));
 }
 //==============================================================================
 // This creates new instances of the plugin..

@@ -47,7 +47,8 @@ private:
 
     std::vector<std::unique_ptr<RhythmModule>> rhythmModules;
 
-    bars barOffset = 0;
+    std::atomic<float> barOffset;
+    std::atomic<float> sequentialOrConcurrentRead;
 
     std::atomic<float>* releaseTime; // user set release time
 

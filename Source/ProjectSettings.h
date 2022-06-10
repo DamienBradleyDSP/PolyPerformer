@@ -21,8 +21,14 @@ namespace ProjectSettings
     constexpr int midiChannel = 1;
     constexpr int VoiceLimit = 16;
 	constexpr int numberOfModules = 4;
-	constexpr int midiNote = 36;
+	constexpr int midiNote = 72;
 
+	enum SequencerFileType
+	{
+		polykol = 0,
+		polyman = 1, 
+		midi = 2
+	};
 
 
 	// POLYKOL PARAM ANALYSIS DEFAULTS
