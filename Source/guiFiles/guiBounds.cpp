@@ -24,15 +24,18 @@ guiBounds::guiBounds(AudioProcessorValueTreeState& parameters, juce::Button::Lis
 	modeSelectorSlider1.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
 	// <<<<CONSTRUCTOR<<<< (will be overwritten!!)  
 
+	modeSelection = parameters.getParameter("modeSelect");
 	modeSelectorSlider1.setRotaryParameters(MathConstants<float>::pi,0, true);
 	modeSelectorSlider1.setMouseDragSensitivity(150);
 	modeSelectorSlider1.setRange(juce::Range<double>(1, 4), 1);
 	modeSelectorSlider1.setValue(4);
 	modeSelectorSlider1.onDragEnd = [this]()
 	{
-		//set parameter here
-
-		//if(modeSelectorSlider1.getValue())
+		auto newValue = 5-modeSelectorSlider1.getValue();
+		auto parameterRange = modeSelection->getNormalisableRange();
+		auto mappedValue = parameterRange.convertTo0to1(newValue);
+		//sliderText.setText(juce::String(newValue), dontSendNotification);
+		modeSelection->setValueNotifyingHost(mappedValue);
 	};
 
 	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,0)));
@@ -40,6 +43,8 @@ guiBounds::guiBounds(AudioProcessorValueTreeState& parameters, juce::Button::Lis
 	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,2)));
 	polyModules.push_back(std::unique_ptr<polyModule>(new polyModule(parameters,p,3)));
 	for (auto&& modu : polyModules) addAndMakeVisible(*modu);
+
+
 }
 
 guiBounds::~guiBounds()
@@ -1149,6 +1154,13 @@ void guiBounds::updateGui(std::vector<juce::String> presetNames)
 	polyModules[1]->setModuleName(presetNames[1]);
 	polyModules[2]->setModuleName(presetNames[2]);
 	polyModules[3]->setModuleName(presetNames[3]);
+
+	for (auto&& modu : polyModules)
+	{
+		modu->updateStateInformation();
+	}
+
+	modeSelectorSlider1.setValue(5-modeSelection->getValue(),dontSendNotification);
 }
 
 // >>>>FUNCTION>>>> (auto-generated)//

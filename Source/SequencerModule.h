@@ -27,6 +27,8 @@ public:
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
     void addMessage(juce::MidiMessage);
 
+    bool isModuleEnabled();
+
     void replaceModuleState(std::unordered_map<juce::String, float>& moduleState);
 
 private:
@@ -50,9 +52,11 @@ private:
 
     std::atomic<float> barOffset;
     std::atomic<float> sequentialOrConcurrentRead;
-
-    std::atomic<float>* releaseTime; // user set release time
+    bool presetLoaded = false;
 
     bool sustainPedal = false;
+
+    std::atomic<float>* moduleOnOff;
+    std::atomic<float>* moduleNoteNumber;
     
 };

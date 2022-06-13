@@ -32,6 +32,8 @@ public:
 
 	void setModuleName(juce::String presetName);
 
+	void updateStateInformation();
+
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(polyModule)
 	int unusedmember;
@@ -49,4 +51,8 @@ private:
 
 	MidiKeyboardState noteSelectorKeyState;
 	MidiKeyboardComponent noteSelectorKeyboard;
+
+	RangedAudioParameter* moduleOnOff;
+	RangedAudioParameter* moduleNoteNumber;
+	RangedAudioParameter* moduleRelease;
 };

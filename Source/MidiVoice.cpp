@@ -10,9 +10,12 @@
 
 #include "MidiVoice.h"
 
-MidiVoice::MidiVoice(AudioProcessorValueTreeState& parameters)
+MidiVoice::MidiVoice(AudioProcessorValueTreeState& parameters, int m)
+    : moduleNumber(m)
 {
     note = juce::MidiMessage::noteOn(ProjectSettings::midiChannel, ProjectSettings::midiNote, (float)ProjectSettings::midiVelocity);
+
+    releaseTime = parameters.getRawParameterValue("moduleRelease" + juce::String(moduleNumber));
 }
 
 MidiVoice::~MidiVoice()
@@ -29,6 +32,8 @@ void MidiVoice::addNoteOn(juce::MidiMessage message, bool sustainPedal)
     isNoteDown = true;
     isSustainPedalDown = sustainPedal;
     releaseTriggered = false;
+    releaseVelocity = 0.0f;
+    releaseBufferIncrement = 0.0f;
     turnVoiceOn(message);
 }
 
@@ -37,7 +42,7 @@ void MidiVoice::addNoteOff(juce::MidiMessage message)
     isNoteDown = false;
     // if release already triggered, reset and return
     if (isSustainPedalDown) return;
-    else triggerRelease();
+    else triggerRelease(message);
 }
 
 void MidiVoice::changeSustain(juce::MidiMessage message)
@@ -45,13 +50,21 @@ void MidiVoice::changeSustain(juce::MidiMessage message)
     isSustainPedalDown = message.isSustainPedalOn();
     if (message.isSustainPedalOff() && !isNoteDown)
     {
-        triggerRelease();
+        triggerRelease(message);
     }
 }
-void MidiVoice::triggerRelease()
+void MidiVoice::triggerRelease(juce::MidiMessage message)
 {
-    releaseTriggered = true;
-    releaseVelocity = 0.0f;
+    
+    auto numberOfBuffersToNoteEnd = (releaseTime->load()*sampleRate)/bufferLength; // 1/(releaseInSeconds*sampleRate/bufferLength) = numberOfbuffers increments needed to get to 0
+    
+    if (numberOfBuffersToNoteEnd == 0.0f) turnVoiceOff(message);
+    else
+    {
+        releaseTriggered = true;
+        releaseVelocity = 0.0f;
+        releaseBufferIncrement = 1 / numberOfBuffersToNoteEnd;
+    }
 }
 void MidiVoice::turnVoiceOn(juce::MidiMessage message)
 {
@@ -82,7 +95,7 @@ bool MidiVoice::generateNewNotes()
 void MidiVoice::startOfBuffer()
 {
     newNoteIncoming = false;
-    if (releaseTriggered) releaseVelocity += 0.001f;
+    if (releaseTriggered) releaseVelocity += releaseBufferIncrement;
     if (releaseVelocity >= 1.0f)
     {
         releaseTriggered = false;

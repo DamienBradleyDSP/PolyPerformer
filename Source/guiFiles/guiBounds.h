@@ -42,4 +42,6 @@ private:
 	const int polyModulepixelGap = 7;
 	
 	std::vector<std::unique_ptr<polyModule>> polyModules;
+
+	RangedAudioParameter* modeSelection;
 };

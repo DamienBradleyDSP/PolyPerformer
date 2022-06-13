@@ -36,6 +36,9 @@ protected:
     virtual void modifyMessage(juce::MidiMessage& message, int bufferLocation) = 0;
     virtual bool generateNewNotes() = 0;
     void resetLoop(int bufferLocation);
+
+    double sampleRate;
+    int bufferLength;
 private:
 
     void checkNoteOffMessages();
@@ -43,8 +46,7 @@ private:
     void flushOldMessages();
 
     std::shared_ptr<juce::AudioProcessorValueTreeState> params;
-    double sampleRate;
-    int bufferLength;
+    
     samples samplesFromRhythmStart;
     bars totalNumberOfBars;
     samples oneBarSampleLength;

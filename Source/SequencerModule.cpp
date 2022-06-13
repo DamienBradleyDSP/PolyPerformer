@@ -13,7 +13,7 @@
 SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters, int m)
     : moduleNumber(m)
 {
-    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiVoice>(new MidiVoice(parameters)));
+    for (int i = 0; i < ProjectSettings::VoiceLimit; i++) midiVoices.push_back(std::unique_ptr<MidiVoice>(new MidiVoice(parameters, m)));
     for (auto&& voice : midiVoices) nonPlayingVoices.push(voice.get());
 
     for (int i = 0; i < ProjectSettings::maxNumberOfRhythmModules; i++)
@@ -31,7 +31,8 @@ SequencerModule::SequencerModule(juce::AudioProcessorValueTreeState& parameters,
     barOffset.store(0);
     sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
 
-    releaseTime = parameters.getRawParameterValue("moduleRelease" + juce::String(moduleNumber));
+    moduleOnOff = parameters.getRawParameterValue("moduleOnOff" + juce::String(moduleNumber));
+    moduleNoteNumber = parameters.getRawParameterValue("moduleNoteNumber" + juce::String(moduleNumber));
 }
 
 SequencerModule::~SequencerModule()
@@ -48,8 +49,7 @@ void SequencerModule::initialise(double s, int b)
 void SequencerModule::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
 {
 
-    //!!!!!!!!!!!!!!!!
-    bars totalNumberOfBars = barOffset; // replace with offset stat
+    bars totalNumberOfBars = barOffset.load(); // replace with offset stat
     for (auto&& modu : rhythmModules) modu->getNumberOfBars(totalNumberOfBars);
 
     // calculate current sample range for buffer and get bar location
@@ -77,6 +77,11 @@ void SequencerModule::addMessage(juce::MidiMessage message)
     else if (message.isSustainPedalOn() || message.isSustainPedalOff()) changeSustain(message);
 }
 
+bool SequencerModule::isModuleEnabled()
+{
+    return presetLoaded && (bool)moduleOnOff->load();
+}
+
 void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>& newState)
 {
     for (auto&& rhythm : rhythmModules) rhythm->replaceModuleState(newState);
@@ -85,11 +90,13 @@ void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>
     {
         barOffset.store(newState["barOffset"]);
         sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polykol);
+        presetLoaded = true;
     }
     else if (newState["fileType"] == ProjectSettings::SequencerFileType::polyman)
     {
         sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polyman);
         barOffset.store(1);
+        presetLoaded = true;
     }
     else jassertfalse;
 }

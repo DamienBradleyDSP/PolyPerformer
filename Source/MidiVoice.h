@@ -16,7 +16,7 @@ class MidiVoice : public MidiController
 {
 public:
     MidiVoice()=delete;
-    MidiVoice(AudioProcessorValueTreeState& parameters);
+    MidiVoice(AudioProcessorValueTreeState& parameters, int moduleNumber);
     ~MidiVoice();
 
     void startOfBuffer();
@@ -28,7 +28,7 @@ public:
     // HANDLE SUSTAIN OUTSIDE THIS CLASS!
     // CHANGE TO JUST "TURN ON" "TURN OFF" AND FEED IN A TRIGGER TO A VELOCITY DROP TO MIMIC SUSTAIN
 private:
-    void triggerRelease();
+    void triggerRelease(juce::MidiMessage message);
     void turnVoiceOn(juce::MidiMessage message);
     void turnVoiceOff(juce::MidiMessage message);
     
@@ -36,6 +36,7 @@ private:
     void modifyMessage(juce::MidiMessage& message, int bufferLocation) override;
     bool generateNewNotes() override;
     
+    const int moduleNumber;
 
     // Internal Note Logic
     juce::MidiMessage note;
@@ -48,6 +49,8 @@ private:
     bool isSustainPedalDown = false;
     bool releaseTriggered = false;
 
+    std::atomic<float>* releaseTime; // user set release time
     float releaseVelocity = 0.0f;
+    float releaseBufferIncrement = 0.0f;
 
 };

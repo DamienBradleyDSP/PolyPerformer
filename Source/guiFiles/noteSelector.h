@@ -20,8 +20,10 @@ class noteSelector : public Button, public MidiKeyboardState::Listener
 {
 public:
 	noteSelector()=delete;
-	noteSelector(AudioProcessorValueTreeState& parameters);
+	noteSelector(AudioProcessorValueTreeState& parameters, int moduleNumber);
     ~noteSelector();
+
+	void updateStateInformation();
 
 protected:
 	void paintButton(Graphics&, bool isMouseOverButton, bool isButtonDown) override;
@@ -37,6 +39,10 @@ private:
 	// >>>>PRIVATEMEMBERS>>>> (auto-generated)//
 	Label noteDisplay1;
 	// <<<<PRIVATEMEMBERS<<<< (will be overwritten!!)
+
+	const int moduleNumber;
+
+	RangedAudioParameter* noteNumber;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (noteSelector)
 };

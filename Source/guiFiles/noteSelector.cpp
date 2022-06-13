@@ -11,8 +11,8 @@
 
 //==============================================================================
 
-noteSelector::noteSelector(AudioProcessorValueTreeState& parameters)
-	: Button(String())
+noteSelector::noteSelector(AudioProcessorValueTreeState& parameters, int m)
+	: Button(String()), moduleNumber(m)
 	// >>>>INITIALISATION>>>> (auto-generated)//
 	// <<<<INITIALISATION<<<< (will be overwritten!!)   
 {
@@ -30,15 +30,23 @@ noteSelector::noteSelector(AudioProcessorValueTreeState& parameters)
 	font.setHeight(20);
 	noteDisplay1.setFont(font);
 	noteDisplay1.setText(String("C#1"),dontSendNotification);
+
 	// ENABLE THIS AFTER PARAMETERS MADE
-	//noteNumber = parameters->getRawParameterValue("midiNoteNumber");
-	//auto noteName = MidiMessage::getMidiNoteName(noteNumber->load(), true, true, 3);
-	//noteDisplay1.setText(noteName, dontSendNotification);
+	noteNumber = parameters.getParameter("moduleNoteNumber"+juce::String(moduleNumber));
+	auto noteName = MidiMessage::getMidiNoteName(noteNumber->getCurrentValueAsText().getFloatValue(), true, true, 3);
+	noteDisplay1.setText(noteName, dontSendNotification);
 
 }
 
 noteSelector::~noteSelector()
 {
+}
+
+void noteSelector::updateStateInformation()
+{
+	auto noteName = MidiMessage::getMidiNoteName(noteNumber->getCurrentValueAsText().getFloatValue(), true, true, 3);
+	noteDisplay1.setText(noteName, dontSendNotification);
+	repaint();
 }
 
 void noteSelector::paintButton(Graphics &g, bool isMouseOverButton, bool isButtonDown)
@@ -99,10 +107,11 @@ void noteSelector::handleNoteOn(MidiKeyboardState* source, int midiChannel, int 
 
 void noteSelector::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
+
 	triggerClick();
 
-	//noteNumber->store(midiNoteNumber);
-	auto noteName = MidiMessage::getMidiNoteName(midiNoteNumber, true, true, 3);
+	noteNumber->setValueNotifyingHost(noteNumber->getValueForText(juce::String(midiNoteNumber)));
+	auto noteName = MidiMessage::getMidiNoteName(noteNumber->getCurrentValueAsText().getFloatValue(), true, true, 3);
 	noteDisplay1.setText(noteName, dontSendNotification);
 }
 

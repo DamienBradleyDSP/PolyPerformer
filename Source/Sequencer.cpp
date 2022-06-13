@@ -14,7 +14,7 @@ Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
     gen(rd()),
     randomSelect({ 0, 1, 2, 3})
 {
-    for (int moduleNumber = 0; moduleNumber <= ProjectSettings::numberOfModules; moduleNumber++)
+    for (int moduleNumber = 0; moduleNumber < ProjectSettings::numberOfModules; moduleNumber++)
     {
         sequencerModules.push_back(std::unique_ptr<SequencerModule>(new SequencerModule(parameters, moduleNumber)));
         moduleOnOff.push_back(parameters.getRawParameterValue("moduleOnOff" + juce::String(moduleNumber)));
@@ -72,7 +72,12 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     buffer.clear();
 
     for (auto&& message : incomingMidi) processIncomingMidi(message.first, message.second);
-    sequencerModules[0]->generateMidi(buffer, playhead);
+    
+
+    for (auto&& modu : enabledModules) if (!modu->isModuleEnabled()) enabledModules.erase(modu);
+    for (auto&& modu : sequencerModules) if (modu->isModuleEnabled()) enabledModules.insert(modu.get());
+    
+    for(auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
 }
 
 void Sequencer::replaceModuleState(std::unordered_map<juce::String, float>& moduleState, int moduleNumber)

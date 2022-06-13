@@ -11,6 +11,7 @@
 #pragma once
 #include <random>
 #include <unordered_map>
+#include <unordered_set>
 #include "JuceHeader.h"
 #include "SequencerModule.h"
 #include "ProjectSettings.h"
@@ -33,7 +34,8 @@ private:
 
     std::vector<std::unique_ptr<SequencerModule>> sequencerModules; // the four sequencer modules allowed to be used
     std::array<SequencerModule*,128> midiNoteToSequencerMap; // maps 128 midi notes to the sequencer using that note VIA pointer
-    MidiKeyboardState midiState; // current key state (no sustain pedal included in this class)
+    std::unordered_set<SequencerModule*> enabledModules;
+    MidiKeyboardState performerMidiKeyState; // key state for the selected notes that govern the sequencer modules ONLY
 
     // Noise generator for mode 1
     std::random_device rd;

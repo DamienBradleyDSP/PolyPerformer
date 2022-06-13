@@ -16,7 +16,7 @@ polyModule::polyModule(AudioProcessorValueTreeState& parameters, juce::Button::L
 	moduleNumber(m)
 
 // >>>>INITIALISATION>>>> (auto-generated)//
-, noteSelector1(parameters)
+, noteSelector1(parameters, moduleNumber)
 , OnOffButton1(parameters)
 , rhythmLoader1(parameters,p)
 // <<<<INITIALISATION<<<< (will be overwritten!!)   
@@ -32,6 +32,19 @@ polyModule::polyModule(AudioProcessorValueTreeState& parameters, juce::Button::L
 	addAndMakeVisible(rhythmLoader1);
 	// <<<<CONSTRUCTOR<<<< (will be overwritten!!)   
 
+	moduleRelease = parameters.getParameter("moduleRelease" + juce::String(moduleNumber));
+	auto sliderStart = moduleRelease->getNormalisableRange().start;
+	auto sliderEnd = moduleRelease->getNormalisableRange().end;
+	sustainSliderSlider1.setRange(sliderStart, sliderEnd);
+	sustainSliderSlider1.onValueChange = [this]() {
+		auto newValue = sustainSliderSlider1.getValue();
+		auto parameterRange = moduleRelease->getNormalisableRange();
+		auto mappedValue = parameterRange.convertTo0to1(newValue);
+		moduleRelease->setValueNotifyingHost(mappedValue);
+	};
+	sustainSliderSlider1.setSkewFactor(0.3);
+	sustainSliderSlider1.setValue(moduleRelease->getNormalisableRange().convertFrom0to1(moduleRelease->getValue()), dontSendNotification);
+
 	addAndMakeVisible(noteSelectorKeyboard);
 	noteSelectorKeyboard.setVisible(false);
 	noteSelectorKeyState.addListener(&noteSelector1);
@@ -41,6 +54,12 @@ polyModule::polyModule(AudioProcessorValueTreeState& parameters, juce::Button::L
 	noteSelectorKeyboard.setColour(MidiKeyboardComponent::ColourIds::upDownButtonArrowColourId, Colour::fromRGB(218, 132, 151));
 
 	rhythmLoader1.setName(juce::String(moduleNumber));
+
+	moduleOnOff = parameters.getParameter("moduleOnOff" + juce::String(moduleNumber));
+	OnOffButton1.setToggleState((bool)moduleOnOff->getValue(), dontSendNotification);
+	OnOffButton1.onClick = [this]() {
+		moduleOnOff->setValueNotifyingHost(OnOffButton1.getToggleState());
+	};
 }
 
 polyModule::~polyModule()
@@ -69,6 +88,14 @@ void polyModule::resized()
 void polyModule::setModuleName(juce::String presetName)
 {
 	rhythmLoader1.setModuleName(presetName);
+}
+
+void polyModule::updateStateInformation()
+{
+	noteSelector1.updateStateInformation();
+	OnOffButton1.setToggleState((bool)moduleOnOff->getValue(), dontSendNotification);
+	sustainSliderSlider1.setValue(moduleRelease->getNormalisableRange().convertFrom0to1(moduleRelease->getValue()), dontSendNotification);
+	sustainSliderSlider1.setValue(moduleRelease->getNormalisableRange().convertFrom0to1(moduleRelease->getValue()), dontSendNotification);
 }
 
 void polyModule::buttonClicked(Button*)
