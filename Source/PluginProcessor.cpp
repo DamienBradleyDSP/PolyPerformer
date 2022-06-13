@@ -189,7 +189,7 @@ void PolyPerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
 
         //sequencer.initialise(SR, 480);
         auto message = MidiMessage::noteOn(1, 60, 1.0f);
-        if(frameCounter<200) midiMessages.addEvent(message, 0);
+        midiMessages.addEvent(message, 0);
         sequencer.generateMidi(midiMessages, currentpositionstruct);
         return;
     } // testing

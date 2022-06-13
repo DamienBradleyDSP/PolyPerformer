@@ -12,7 +12,7 @@
 
 Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
     gen(rd()),
-    randomSelect({ 0, 1, 2, 3})
+    randomSelect(0.0f, 1.0f)
 {
     for (int moduleNumber = 0; moduleNumber < ProjectSettings::numberOfModules; moduleNumber++)
     {
@@ -22,9 +22,9 @@ Sequencer::Sequencer(juce::AudioProcessorValueTreeState& parameters) :
     }
 
     modeSelect = parameters.getRawParameterValue("modeSelect");
-    for (auto&& entry : midiNoteToSequencerMap)
+    for (int midiNote=1; midiNote <= 127 ; midiNote++)
     {
-        entry = sequencerModules[0].get();
+        midiNoteToSequencerMap.insert(std::make_pair(midiNote, sequencerModules[0].get()));
     }
     
 }
@@ -69,14 +69,9 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
     MidiBuffer::Iterator i(buffer);
     int sampleLocation;
     while (i.getNextEvent(nullMessage, sampleLocation)) incomingMidi.push_back(std::make_pair(nullMessage, sampleLocation));
-    buffer.clear();
+    buffer.clear();    
 
     for (auto&& message : incomingMidi) processIncomingMidi(message.first, message.second);
-    
-
-    for (auto&& modu : enabledModules) if (!modu->isModuleEnabled()) enabledModules.erase(modu);
-    for (auto&& modu : sequencerModules) if (modu->isModuleEnabled()) enabledModules.insert(modu.get());
-    
     for(auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
 }
 
@@ -94,12 +89,69 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
     // Pass midi voice + buffer to rhythm and beat,  beat will make checks and pass buffer to voice
 
     message.setTimeStamp(sampleLocation);
-    sequencerModules[0]->addMessage(message);
+    
+
+    // if sustain pedal on/off, send to all
+    if (message.isSustainPedalOff() || message.isSustainPedalOn())
+    {
+        for (auto&& modu : sequencerModules) modu->addMessage(message);
+        return;
+    }
+
+    // if midi note matches given notes in selectors, process as performer midi
+    for (auto&& moduleNote : moduleNoteNumber)
+    {
+        if (message.getNoteNumber() == moduleNote->load())
+        {
+            processPerformerMidi(message);
+            return;
+        }
+    }
+    
+    // if note off, send to given midi to sequencer map
+     
+    if (message.isNoteOff())
+    {
+        if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return;
+        else
+        {
+            midiNoteToSequencerMap[message.getNoteNumber()]->addMessage(message);
+        }
+    }
+    else if (message.isNoteOn())
+    {
+        if(modeSelect->load()==1) processRandomNoteOn(message);
+    }
+}
+
+void Sequencer::forceNoteOff(juce::MidiMessage message)
+{
+    auto noteOffMessage = message;
+    noteOffMessage.setTimeStamp(0);
+    midiNoteToSequencerMap[message.getNoteNumber()]->forceVoiceOff(noteOffMessage);
+    midiNoteToSequencerMap[message.getNoteNumber()] = nullptr;
+}
+
+void Sequencer::processPerformerMidi(juce::MidiMessage message)
+{
 }
 
 void Sequencer::processRandomNoteOn(juce::MidiMessage message)
 {
-    //auto selection = randomSelect(gen);
-    //sequencerModules[0]->addNoteOn(message);
-    //midiNoteToSequencerMap[message.getNoteNumber()] = sequencerModules[0].get();
+    forceNoteOff(message);
+
+    std::vector<SequencerModule*> enabledModules;
+    for (auto&& modu : sequencerModules)
+    {
+        if(modu->isModuleEnabled()) enabledModules.push_back(modu.get());
+    }
+
+    auto selection = randomSelect(gen);
+    int size = enabledModules.size();
+    if (size == 0) return;
+    float scaledSelection = std::round(selection * (size-1));
+
+    enabledModules[(int)scaledSelection]->addMessage(message);
+    midiNoteToSequencerMap[message.getNoteNumber()] = enabledModules[(int)scaledSelection];
+
 }

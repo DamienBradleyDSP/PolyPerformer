@@ -77,6 +77,12 @@ void SequencerModule::addMessage(juce::MidiMessage message)
     else if (message.isSustainPedalOn() || message.isSustainPedalOff()) changeSustain(message);
 }
 
+void SequencerModule::forceVoiceOff(juce::MidiMessage message)
+{
+    if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return;
+    midiNoteToSequencerMap[message.getNoteNumber()]->forceVoiceOff(message);
+}
+
 bool SequencerModule::isModuleEnabled()
 {
     return presetLoaded && (bool)moduleOnOff->load();

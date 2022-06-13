@@ -103,6 +103,7 @@ void MidiController::addMidiMessage(juce::MidiMessage& noteOnMessage, bars noteO
     // Currently checks twice but why
     auto noteOnSampleLocation = getLocation(noteOnPosition);
     if (noteOnSampleLocation == -1) return;
+    if (noteOnSampleLocation == 0) noteOnSampleLocation = 1;
 
     modifyMessage(noteOnMessage, noteOnSampleLocation);
     modifyMessage(noteOffMessage, noteOnSampleLocation);

@@ -53,6 +53,10 @@ void MidiVoice::changeSustain(juce::MidiMessage message)
         triggerRelease(message);
     }
 }
+void MidiVoice::forceVoiceOff(juce::MidiMessage message)
+{
+    turnVoiceOff(message);
+}
 void MidiVoice::triggerRelease(juce::MidiMessage message)
 {
     

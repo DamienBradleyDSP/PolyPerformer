@@ -25,6 +25,7 @@ public:
     void addNoteOn(juce::MidiMessage message, bool sustainPedal);
     void addNoteOff(juce::MidiMessage message);
     void changeSustain(juce::MidiMessage message);
+    void forceVoiceOff(juce::MidiMessage message);
     // HANDLE SUSTAIN OUTSIDE THIS CLASS!
     // CHANGE TO JUST "TURN ON" "TURN OFF" AND FEED IN A TRIGGER TO A VELOCITY DROP TO MIMIC SUSTAIN
 private:

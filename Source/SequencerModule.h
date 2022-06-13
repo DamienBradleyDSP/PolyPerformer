@@ -26,6 +26,7 @@ public:
     void initialise(double sampleRate, int bufferSize);
     void generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead);
     void addMessage(juce::MidiMessage);
+    void forceVoiceOff(juce::MidiMessage);
 
     bool isModuleEnabled();
 
