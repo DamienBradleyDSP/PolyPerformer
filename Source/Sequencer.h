@@ -32,11 +32,18 @@ private:
     void processIncomingMidi(juce::MidiMessage message, int sampleLocation);
     void forceNoteOff(juce::MidiMessage message);
     void processPerformerMidi(juce::MidiMessage message);
-    void processRandomNoteOn(juce::MidiMessage message);
+    void noteOnModeRandomSelection(juce::MidiMessage message);
+    void noteOnModeSequentialSelection(juce::MidiMessage message);
+    void noteOnModeTimeLinkedRandom(juce::MidiMessage message);
+    void noteOnModeChordLinkedSequential(juce::MidiMessage message);
+
+    double sampleRate;
+    int bufferSize;
 
     std::vector<std::unique_ptr<SequencerModule>> sequencerModules; // the four sequencer modules allowed to be used
     std::unordered_map<int, SequencerModule*> midiNoteToSequencerMap; // maps 128 midi notes to the sequencer using that note VIA pointer
     MidiKeyboardState performerMidiKeyState; // key state for the selected notes that govern the sequencer modules ONLY
+    std::list<SequencerModule*> performerMidiEngagedModules;
 
     // Noise generator for mode 1
     std::random_device rd;
@@ -46,4 +53,11 @@ private:
     std::atomic<float>* modeSelect;
     std::vector<std::atomic<float>*> moduleOnOff;
     std::vector<std::atomic<float>*> moduleNoteNumber;
+
+    int nextSequentialSelection = 0; // Sequential selection mode, last selection memory var
+
+    int sampleSinceLastNote = 0; // Time linked selection mode, last selection memory
+    SequencerModule* currentSelection;
+
+    MidiKeyboardState chordLinkedSequential; //Chord Linked Sequential Keyboard state
 };

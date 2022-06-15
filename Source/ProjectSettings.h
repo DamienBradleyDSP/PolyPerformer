@@ -25,6 +25,7 @@ namespace ProjectSettings
 	constexpr int midiNote = 72;
 	constexpr int maxNumberOfRhythmModules = 32;
 	constexpr int maxNumberOfBeats = 32;
+	constexpr float numberOfSecondsBetweenRhythmChange = 2; // Time Linked random selection mode
 
 	enum SequencerFileType
 	{

@@ -79,7 +79,7 @@ void SequencerModule::addMessage(juce::MidiMessage message)
 
 void SequencerModule::forceVoiceOff(juce::MidiMessage message)
 {
-    if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return;
+    if (!midiNoteToSequencerMap[message.getNoteNumber()]) return;
     midiNoteToSequencerMap[message.getNoteNumber()]->forceVoiceOff(message);
 }
 

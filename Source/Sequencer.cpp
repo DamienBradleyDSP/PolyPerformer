@@ -33,9 +33,12 @@ Sequencer::~Sequencer()
 {
 }
 
-void Sequencer::initialise(double sampleRate, int bufferSize)
+void Sequencer::initialise(double s, int b)
 {
-    for (auto&& modu : sequencerModules) modu->initialise(sampleRate, bufferSize);
+    for (auto&& modu : sequencerModules) modu->initialise(s, b);
+
+    sampleRate = s;
+    bufferSize = b;
 }
 
 void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::CurrentPositionInfo& playhead)
@@ -73,6 +76,8 @@ void Sequencer::generateMidi(juce::MidiBuffer& buffer, juce::AudioPlayHead::Curr
 
     for (auto&& message : incomingMidi) processIncomingMidi(message.first, message.second);
     for(auto&& modu : sequencerModules) modu->generateMidi(buffer, playhead);
+
+    sampleSinceLastNote += bufferSize;
 }
 
 void Sequencer::replaceModuleState(std::unordered_map<juce::String, float>& moduleState, int moduleNumber)
@@ -99,6 +104,7 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
     }
 
     // if midi note matches given notes in selectors, process as performer midi
+    auto iter = sequencerModules.begin();
     for (auto&& moduleNote : moduleNoteNumber)
     {
         if (message.getNoteNumber() == moduleNote->load())
@@ -106,13 +112,14 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
             processPerformerMidi(message);
             return;
         }
+        std::advance(iter, 1);
     }
     
     // if note off, send to given midi to sequencer map
      
     if (message.isNoteOff())
     {
-        if (midiNoteToSequencerMap[message.getNoteNumber()] == nullptr) return;
+        if (!midiNoteToSequencerMap[message.getNoteNumber()]) return;
         else
         {
             midiNoteToSequencerMap[message.getNoteNumber()]->addMessage(message);
@@ -120,7 +127,10 @@ void Sequencer::processIncomingMidi(juce::MidiMessage message, int sampleLocatio
     }
     else if (message.isNoteOn())
     {
-        if(modeSelect->load()==1) processRandomNoteOn(message);
+        if(modeSelect->load()==1) noteOnModeRandomSelection(message);
+        else if(modeSelect->load()==2) noteOnModeSequentialSelection(message);
+        else if(modeSelect->load()==3) noteOnModeTimeLinkedRandom(message);
+        else if(modeSelect->load()==4) noteOnModeChordLinkedSequential(message);
     }
 }
 
@@ -128,30 +138,126 @@ void Sequencer::forceNoteOff(juce::MidiMessage message)
 {
     auto noteOffMessage = message;
     noteOffMessage.setTimeStamp(0);
-    midiNoteToSequencerMap[message.getNoteNumber()]->forceVoiceOff(noteOffMessage);
-    midiNoteToSequencerMap[message.getNoteNumber()] = nullptr;
+    if (midiNoteToSequencerMap[message.getNoteNumber()])
+    {
+        midiNoteToSequencerMap[message.getNoteNumber()]->forceVoiceOff(noteOffMessage);
+        midiNoteToSequencerMap[message.getNoteNumber()] = nullptr;
+    }
 }
 
 void Sequencer::processPerformerMidi(juce::MidiMessage message)
 {
+
+    performerMidiKeyState.processNextMidiEvent(message);
+
+    // verify key state still represents corrects performer here
+    auto module1 = performerMidiKeyState.isNoteOnForChannels(127, moduleNoteNumber[0]->load());
+    auto module2 = performerMidiKeyState.isNoteOnForChannels(127, moduleNoteNumber[1]->load());
+    auto module3 = performerMidiKeyState.isNoteOnForChannels(127, moduleNoteNumber[2]->load());
+    auto module4 = performerMidiKeyState.isNoteOnForChannels(127, moduleNoteNumber[3]->load());
+
+    performerMidiEngagedModules.clear();
+    if (module1) performerMidiEngagedModules.push_back(sequencerModules[0].get());
+    if (module2) performerMidiEngagedModules.push_back(sequencerModules[1].get());
+    if (module3) performerMidiEngagedModules.push_back(sequencerModules[2].get());
+    if (module4) performerMidiEngagedModules.push_back(sequencerModules[3].get());
 }
 
-void Sequencer::processRandomNoteOn(juce::MidiMessage message)
+void Sequencer::noteOnModeRandomSelection(juce::MidiMessage message)
 {
+    // Random note selection, if performer notes held down it will only select from those modules, forces note off before playing
+    
     forceNoteOff(message);
 
     std::vector<SequencerModule*> enabledModules;
-    for (auto&& modu : sequencerModules)
+
+    for (auto&& modu : performerMidiEngagedModules)
     {
-        if(modu->isModuleEnabled()) enabledModules.push_back(modu.get());
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu);
+    }
+    if (enabledModules.size() == 0) for (auto&& modu : sequencerModules)
+    {
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu.get());
+    }
+
+
+    auto selection = randomSelect(gen);
+    int size = enabledModules.size();
+    if (size == 0) return;
+    float scaledSelection = std::round(selection * (size - 1));
+
+    enabledModules[(int)scaledSelection]->addMessage(message);
+    midiNoteToSequencerMap[message.getNoteNumber()] = enabledModules[(int)scaledSelection];
+}
+
+void Sequencer::noteOnModeSequentialSelection(juce::MidiMessage message)
+{
+    // Sequential note selection, if performer notes held down it will only select from those modules, forces note off before playing
+
+    forceNoteOff(message);
+
+    std::vector<SequencerModule*> enabledModules;
+
+    for (auto&& modu : performerMidiEngagedModules)
+    {
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu);
+    }
+    if (enabledModules.size() == 0) for (auto&& modu : sequencerModules)
+    {
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu.get());
+    }
+
+    int size = enabledModules.size();
+    if (size == 0) return;
+
+    if (nextSequentialSelection >= size) nextSequentialSelection = 0;
+    enabledModules[nextSequentialSelection]->addMessage(message);
+    midiNoteToSequencerMap[message.getNoteNumber()] = enabledModules[nextSequentialSelection];
+
+    nextSequentialSelection++;
+}
+
+void Sequencer::noteOnModeTimeLinkedRandom(juce::MidiMessage message)
+{
+    auto samplesBetweenChanges = ProjectSettings::numberOfSecondsBetweenRhythmChange * sampleRate;
+
+    if (sampleSinceLastNote < samplesBetweenChanges && currentSelection) if(currentSelection->isModuleEnabled())
+    {
+        forceNoteOff(message);
+        currentSelection->addMessage(message);
+        midiNoteToSequencerMap[message.getNoteNumber()] = currentSelection;
+        sampleSinceLastNote = 0;
+        return;
+    }
+
+    sampleSinceLastNote = 0;
+
+    forceNoteOff(message);
+
+    std::vector<SequencerModule*> enabledModules;
+
+    for (auto&& modu : performerMidiEngagedModules)
+    {
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu);
+    }
+    if (enabledModules.size() == 0) for (auto&& modu : sequencerModules)
+    {
+        if (modu->isModuleEnabled()) enabledModules.push_back(modu.get());
     }
 
     auto selection = randomSelect(gen);
     int size = enabledModules.size();
     if (size == 0) return;
-    float scaledSelection = std::round(selection * (size-1));
+    float scaledSelection = std::round(selection * (size - 1));
 
     enabledModules[(int)scaledSelection]->addMessage(message);
     midiNoteToSequencerMap[message.getNoteNumber()] = enabledModules[(int)scaledSelection];
+    currentSelection = enabledModules[(int)scaledSelection];
 
+}
+
+void Sequencer::noteOnModeChordLinkedSequential(juce::MidiMessage message)
+{
+    // Unused currently
+    noteOnModeRandomSelection(message);
 }
