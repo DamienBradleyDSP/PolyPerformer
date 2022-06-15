@@ -57,7 +57,7 @@ private:
     int nextSequentialSelection = 0; // Sequential selection mode, last selection memory var
 
     int sampleSinceLastNote = 0; // Time linked selection mode, last selection memory
-    SequencerModule* currentSelection;
+    SequencerModule* currentSelection = nullptr;
 
     MidiKeyboardState chordLinkedSequential; //Chord Linked Sequential Keyboard state
 };
