@@ -64,7 +64,7 @@ void Beat::replaceModuleState(std::unordered_map<juce::String, float>& newState)
         midiOctave.store(0);
         sustain.store(1);
     }
-    else jassertfalse;
+    else return;
 
 
 

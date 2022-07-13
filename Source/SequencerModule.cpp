@@ -104,7 +104,7 @@ void SequencerModule::replaceModuleState(std::unordered_map<juce::String, float>
         barOffset.store(1);
         presetLoaded = true;
     }
-    else jassertfalse;
+    else return;
 }
 
 void SequencerModule::addNoteOn(juce::MidiMessage message)

@@ -71,7 +71,7 @@ void RhythmModule::replaceModuleState(std::unordered_map<juce::String, float>& n
         sequentialOrConcurrentRead.store(ProjectSettings::SequencerFileType::polyman);
         lastModuleBarEnding = 0;
     }
-    else jassertfalse;
+    else return;
 }
 
 bars RhythmModule::calculateBarSpan()

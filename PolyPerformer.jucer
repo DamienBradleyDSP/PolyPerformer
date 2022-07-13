@@ -62,7 +62,7 @@
         <CONFIGURATION isDebug="1" name="Debug" targetName="PolyPerformer" enablePluginBinaryCopyStep="1"
                        vst3BinaryLocation="C:\Users\Damien\Documents\VST"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="PolyPerformer" enablePluginBinaryCopyStep="1"
-                       vst3BinaryLocation="C:\Users\Damien\Documents\VST"/>
+                       vst3BinaryLocation="C:\Users\Damien\Documents\VST" useRuntimeLibDLL="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
